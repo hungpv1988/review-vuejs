@@ -1,6 +1,27 @@
 <script setup>
+import { ref, computed } from 'vue'
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
+import PageA from './components/Tab/PageA.vue'
+import PageB from './components/Tab/PageB.vue'
+import PageHome from './components/Tab/PageHome.vue'
+import PageBrokenLink from './components/Tab/PageBrokenLink.vue'
+
+const routes = {
+    '/': PageHome,
+  '/PageA': PageA,
+  '/PageB': PageB
+}
+
+const currentPath = ref(window.location.hash)
+
+window.addEventListener('hashchange', () => {
+  currentPath.value = window.location.hash
+})
+
+const currentView = computed(() => {
+  return routes[currentPath.value.slice(1) || '/'] || PageBrokenLink
+})
 </script>
 
 <template>
@@ -14,6 +35,12 @@ import TheWelcome from './components/TheWelcome.vue'
 
   <main>
     <TheWelcome />
+    <br />
+    <a href="#/">Home</a> |
+    <a href="#/PageA">Page A</a> |
+    <a href="#/PageB">Page B</a> |
+    <a href="#/non-existent-path">BrokenLink</a>
+    <component :is="currentView" />
   </main>
 </template>
 
