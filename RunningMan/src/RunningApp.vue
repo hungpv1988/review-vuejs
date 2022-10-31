@@ -1,10 +1,16 @@
 <template>
-  <div>
-    <div  v-for="item in items" :key="item.id" >
-         <ImageComponent v-bind:thumbnail="item.thumbnail" v-bind:imageUrl="item.imageUrl"/>
-    </div>
+  <div class="flex-container" style="margin: 15px 15px 15px 15px;">
+      <ImageComponent  v-for="item in items" :key="item.id" v-bind:thumbnail="item.thumbnail" v-bind:imageUrl="item.imageUrl"/>
   </div>
 </template>
+
+<style scoped>
+ .flex-container {
+    display: flex;
+    flex-direction: row;
+     align-items: center;
+  }
+</style>
 
 <script setup>
 import  ImageComponent  from './components/ImageComponent.vue'

@@ -1,6 +1,6 @@
 <template>
   <div class="col-sm-6 col-md-3 col-lg-2 img-thumbnail-div">
-    <a href=""> 
+    <a v-bind:href=imageUrl> 
         <img v-bind:src=thumbnail>
     </a>
   </div>
