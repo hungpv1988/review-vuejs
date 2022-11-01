@@ -15,6 +15,12 @@
     text-align: center;
 }
 
+/* Responsive layout - makes a one column-layout instead of two-column layout */
+@media (max-width: 800px) {
+  .flex-container {
+    flex-direction: column;
+  }
+}
 </style>
 
 <script setup>
