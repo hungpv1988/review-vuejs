@@ -1,7 +1,5 @@
 <script setup>
 import { ref, computed } from 'vue'
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
 import PageA from './components/Tab/PageA.vue'
 import PageB from './components/Tab/PageB.vue'
 import PageHome from './components/Tab/PageHome.vue'

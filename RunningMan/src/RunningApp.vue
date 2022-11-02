@@ -60,6 +60,7 @@ body { padding-top: 40px; }
 import SearchComponent from './components/SearchComponent.vue'
 import AllImages from './components/AllImages.vue'
 import {ref, computed} from 'vue'
+import { Fancybox } from "@fancyapps/ui";
   const routes = {
     '/': AllImages,
     '/Search': SearchComponent,
@@ -75,4 +76,21 @@ import {ref, computed} from 'vue'
   const currentView = computed(() => {
     return routes[currentPath.value.slice(1) || '/'] || PageBrokenLink
   })
+
+  Fancybox.bind('[data-fancybox="imggroup"]', {
+  Toolbar: {
+    display: [
+      { id: "prev", position: "center" },
+      { id: "counter", position: "center" },
+      { id: "next", position: "center" },
+      "zoom",
+      "download",
+      "slideshow",
+      "fullscreen",
+      "download",
+      "thumbs",
+      "close",
+    ],
+  },
+});
 </script>

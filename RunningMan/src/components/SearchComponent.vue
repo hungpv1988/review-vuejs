@@ -7,7 +7,7 @@
     
         <div class="flex-container row" style="margin: 15px 15px 15px 15px;" >
             <div class="col-sm-6 col-md-3 col-lg-2" v-for="item in itemsDisplayedOnScreen" :key="item.id">
-                <a v-bind:href="item.imageUrl"> 
+                <a data-fancybox="imggroup" v-bind:href="item.imageUrl"> 
                     <img v-bind:src="item.thumbnail">
                 </a>
            </div>
