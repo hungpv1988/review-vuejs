@@ -12,24 +12,6 @@
 
 <style scoped>
 
-.cursor {
-  cursor: pointer;
-}
-
-#top_menu {
-  list-style: none;
-  display: flex;
-  padding: 0;
-  margin-bottom: 0;
-}
-
-#top_menu li {
-  border: 1px solid #ccc;
-  margin: 2px;
-  padding: 5px 10px;
-  color: #555;
-  cursor: pointer;
-}
 
 /* Responsive layout - makes a two column-layout instead of four columns */
 @media (max-width: 800px) {
@@ -47,9 +29,7 @@
   }
 }
 
-body {
-  padding-top: 40px;
-}
+
 </style>
 
 <script setup>

@@ -24,14 +24,14 @@
 </style>
 
 <script setup>
-const props = defineProps({
-  thumbnail: {
-    type: String,
-    required: true
-  },
-  imageUrl: {
-    type: String,
-    required: true
-  }
-})
+    const props = defineProps({
+      thumbnail: {
+        type: String,
+        required: true
+      },
+      imageUrl: {
+        type: String,
+        required: true
+      }
+    })
 </script>
