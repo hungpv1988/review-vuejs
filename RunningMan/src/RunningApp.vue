@@ -1,12 +1,20 @@
 <template>
   <div>
     <h1>Longbien Marathon 2022 - Race Photos</h1>
+    <div class="row" style="display: flex; margin-botton: 10px">
+          <a style="cursor: pointer; margin-right: 30px" >Tìm theo BIB</a>
+          <a style="cursor: pointer" >Tất cả ảnh</a>
+    </div>
     <div id="bib-search">
           <input type="text" style="margin-right: 10px" v-model="searchKeywork" />
           <button @click="search" > Search </button>
     </div>
-    <div class="flex-container" style="margin: 15px 15px 15px 15px;">
-        <ImageComponent  v-for="item in itemsDisplayedOnScreen" :key="item.id" v-bind:thumbnail="item.thumbnail" v-bind:imageUrl="item.imageUrl"/>
+    <div class="flex-container row" style="margin: 15px 15px 15px 15px;" >
+        <div class="col-sm-6 col-md-3 col-lg-2" v-for="(item, index) in itemsDisplayedOnScreen" :key="item.id">
+            <a v-bind:href="item.imageUrl"> 
+                <img v-bind:src="item.thumbnail">
+            </a>
+       </div>
     </div>
   </div>
 </template>
@@ -17,6 +25,26 @@
     flex-direction: row;
     align-items: center;
   }
+
+ .cursor {
+    cursor: pointer;
+  }
+
+ 
+#top_menu {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+#top_menu li {
+    border: 1px solid #CCC;
+    margin: 2px;
+    padding: 5px 10px;
+    color: #555;
+    cursor: pointer;
+}
 
   /* Responsive layout - makes a two column-layout instead of four columns */
 @media (max-width: 800px) {
@@ -64,13 +92,13 @@ const state = reactive({items: getData()})
           var imageList = [];
           response.data.imageList.forEach(element => {
             imageList.push({
-              id: searchKeywork.value,
+              id: parseInt(searchKeywork.value),
               "thumbnail": element.thumbnail,
               "imageUrl": element.imageUrl
             })
           });
-          itemsDisplayedOnScreen.value  = null;
-          itemsDisplayedOnScreen.value = imageList;
+    
+     //     itemsDisplayedOnScreen.value = imageList;
        });
 
       itemsDisplayedOnScreen.value = state.items.filter(item => item.id > searchKeywork.value)
