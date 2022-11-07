@@ -3,7 +3,7 @@ import {ref} from "vue";
 
 export function getGlobalConfig(){
   const startingPage = 1;
-  const pageSize = 8;
+  const pageSize = 40;
   //remove campaignId
   const imageEndpoint = "http://146.190.192.127:8080/v1/images/get-images?campaignId=1";
   const localImageEndpoint = ""; // or "https://localhost:44301/Running/" if it's local api, not fixed data
@@ -11,7 +11,7 @@ export function getGlobalConfig(){
   const searchEndpoint = "http://146.190.192.127:8080/v1/images/search-images?campaignId=1"; 
   const localSearchEndpoint = ""; // or "https://localhost:44301/Running/" + bip if it's local api, not fixed data
  
-  return {startingPage, pageSize, imageEndpoint, localImageEndpoint};
+  return {startingPage, pageSize, imageEndpoint, localImageEndpoint, searchEndpoint, localSearchEndpoint};
 }
 
 export async function getData(url, pageNumber = 1, pageSize = 8){
@@ -19,7 +19,7 @@ export async function getData(url, pageNumber = 1, pageSize = 8){
       return GetMockData(pageNumber, pageSize);
    };
    
-   url = url +'&page='+(pageNumber-1)+'&size='+ pageSize;
+   url = url +'&page='+(pageNumber)+'&size='+ pageSize;
    // need paging from 1, not 0
    return await axios.get(url , {
     headers:{
@@ -35,9 +35,8 @@ export async function searchBIP(url, bib, pageNumber, pageSize){
     return GetMockData(pageNumber, pageSize);
   };
 
- // let imageList = ref([]); //&page=0&size=10
   url = url+"&bib="+bib + "&page="+pageNumber+"&size="+pageSize;
-  await axios.get(url , {
+  return await axios.get(url , {
           headers:{
             'X-Requested-With': 'XMLHttpRequest',
             'Access-Control-Allow-Origin' : '*',
@@ -48,7 +47,7 @@ export async function searchBIP(url, bib, pageNumber, pageSize){
 
 
 function GetMockData(pageNumber, pageSize){
-   var startIndex = (pageNumber-1)  * pageSize;
+   var startIndex = pageNumber  * pageSize;
    var endIndex = pageNumber  * pageSize;
    var total = data.length;
    var slicedItems = data.slice(startIndex, endIndex); 

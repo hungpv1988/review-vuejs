@@ -43,7 +43,7 @@ const startingPage = global.startingPage,
     let itemsDisplayedOnScreen = ref([]);
 
     function search(event){
-      searchBIP(localSearchEndpoint, searchKeywork.value, startingPage, pageSize)
+      searchBIP(apiEndpoint, searchKeywork.value, startingPage, pageSize)
        .then(response => {
           var imageList = [];
           response.data.images.forEach(element => {
