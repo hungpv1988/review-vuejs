@@ -3,7 +3,7 @@ import {ref} from "vue";
 
 export function getGlobalConfig(){
   const startingPage = 1;
-  const pageSize = 4;
+  const pageSize = 8;
   //remove campaignId
   const imageEndpoint = "http://146.190.192.127:8080/v1/images/get-images?campaignId=1";
   const localImageEndpoint = ""; // or "https://localhost:44301/Running/" if it's local api, not fixed data
@@ -14,7 +14,7 @@ export function getGlobalConfig(){
   return {startingPage, pageSize, imageEndpoint, localImageEndpoint};
 }
 
-export async function getData(url, pageNumber = 1, pageSize = 4){
+export async function getData(url, pageNumber = 1, pageSize = 8){
    if (!url){ // local environment
       return GetMockData(pageNumber, pageSize);
    };
