@@ -28,26 +28,25 @@
 
 <script setup>
 import {computed, reactive, ref} from 'vue'
-import  ImageComponent  from './ImageComponent.vue'
-import {getData, searchBIP} from '../services/DataService'
+import {getGlobalConfig, searchBIP} from '../services/DataService'
 import axios from "axios";
 
-const searchKeywork = ref(null);
+var global = getGlobalConfig();
+const startingPage = global.startingPage,
+      pageSize = global.pageSize,
+      searchEndpoint = global.searchEndpoint,
+      localSearchEndpoint = global.localSearchEndpoint,
+      searchKeywork = ref(null),
+      apiEndpoint = searchEndpoint; // or localSearchEndpoint if running local
 
 
     let itemsDisplayedOnScreen = ref([]);
 
     function search(event){
-       axios.get('https://localhost:44301/Running/'+ searchKeywork.value , {
-          headers:{
-            'X-Requested-With': 'XMLHttpRequest',
-            'Access-Control-Allow-Origin' : '*',
-            'Access-Control-Allow-Methods':'GET'
-          }
-       })
+      searchBIP(localSearchEndpoint, searchKeywork.value, startingPage, pageSize)
        .then(response => {
           var imageList = [];
-          response.data.imageList.forEach(element => {
+          response.data.images.forEach(element => {
             imageList.push({
               id: parseInt(searchKeywork.value),
               "thumbnail": element.thumbnail,
