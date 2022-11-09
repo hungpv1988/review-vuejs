@@ -5,8 +5,9 @@
         <a style="cursor: pointer; margin-right: 30px" href="#/Search">Tìm theo BIB</a> |
         <a href="#/AllImages">Tất cả ảnh</a> 
     </div>
-  
-    <component :is="currentView" />
+      <KeepAlive>
+         <component :is="currentView" />
+      </KeepAlive>
   </div>
 </template>
 
