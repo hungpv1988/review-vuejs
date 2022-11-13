@@ -141,19 +141,37 @@
 }
 </style>
 <script setup>
-import {ref} from 'vue';
+import {ref, onMounted} from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import axios from "axios";  
 const options = ref([
-                        {text:"PVOIL VOC 2022",value:"1"},
-                        {text:"Maraton LongBien 2022",value:"2"},
-                        {text:"Halong 2022",value:"3"},
-                        {text:"Hue 2022",value:"4"},
+                       
 ]);
 
 const router = useRouter();
-const route = useRoute();
-const raceid = ref(options.value[0].value);
+// const route = useRoute(); keep here for code reference later on
+const raceid = ref(1);
 const bib = ref(null);
+
+// first phase in the flow. Load all races
+onMounted(async() => {
+  // just a simple fetching, so take it easy here
+    var apiEndpoint = "http://146.190.192.127:8080/v1/campaign/find";
+
+   return await axios.get(apiEndpoint , {
+    headers:{
+      'X-Requested-With': 'XMLHttpRequest',
+      'Access-Control-Allow-Origin' : '*',
+      'Access-Control-Allow-Methods':'GET'
+    }}).then(response => {
+              var campaigns = response.data.campaigns;
+              campaigns.forEach((item) => {
+                options.value.push({value: item.campaignId, text: item.campaignName});
+              });
+              raceid.value = options.value[0].value;
+          });
+})
+
 function moveToPage(){
      router.push({name: 'raceimages', query:{raceid: raceid.value, bib:bib.value}});
 }

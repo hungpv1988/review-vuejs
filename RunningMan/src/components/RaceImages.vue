@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- replace by variable -->
-    <h1>Longbien Marathon 2022 - Race Photos</h1>
+    <h1>{{raceName}}</h1>
     <div class="container-fluid">
        <div class="row">
           <div class="col-sm-6">
@@ -25,7 +25,7 @@
 
       <div id="image-box">
             <div class="row" style="margin-top: 20px;"> 
-                    <div class="col-md-9" style="margin-bottom: 1rem"> Có <strong>142,461</strong> ảnh của bạn, trong tổng số <strong>142,461</strong> ảnh </div>
+                    <div class="col-md-9" style="margin-bottom: 1rem"> Có <strong>{{totalImagesFound}}</strong> ảnh được tìm thấy {{yourName}} </div>
         
                     <div class="col-md-3">
                             <!-- page-count must be bound to  either state.total or a computed total. Cannot work with  constant and perhaps, let (but may be, use in wrong way) -->
@@ -115,6 +115,11 @@ else if (searchType.value == 2) {
 // click on a new page as pagination has done it
 const selectedPage = ref(1);
 
+// setup msg
+const raceName = ref("Longbien Marathon 2022 - Race Photos"); 
+const totalImagesFound = ref("");
+const yourName = ref("");
+
 // setup fancy box
 Fancybox.bind('[data-fancybox="imggroup"]', {
   Toolbar: {
@@ -162,6 +167,9 @@ onMounted(async() => {
               migrateImagesToState(response.data.images, state, startingPage);
               state.pageCount = Math.ceil(response.data.total / pageSize);
               currentPage.value = startingPage; // remember .value for currentPage, otherwise, it loses reactivity
+              totalImagesFound.value = response.data.total;
+              yourName.value = (!response.data.name) ? "" : response.data.name ;
+              raceName.value = response.data.campaignName;
           });
 })
  
@@ -242,6 +250,9 @@ async function searchImages(value){
           state.pageCount  = Math.ceil(response.data.total / pageSize);
           currentPage.value = startingPage; // remember .value for currentPage, otherwise, it loses reactivity
           selectedPage.value = 1;
+          totalImagesFound.value = response.data.total;
+          yourName.value = (!response.data.name) ? "" : response.data.name ;
+          raceName.value = response.data.campaignName;
       });
 }
 </script>
