@@ -3,14 +3,15 @@ import RunningApp from './RunningApp.vue'
 import './assets/main.css'
 import Paginate from "vuejs-paginate-next";
 import { createRouter, createWebHistory } from 'vue-router';
-import RaceImage from './components/RaceImage.vue';
+import RaceImages from './components/RaceImages.vue';
 import HomePage from './components/HomePage.vue';
-import AllImages from './components/AllImages.vue'; // remember to remove s
-import SearchComponent from './components/SearchComponent.vue'; // remember to remove s
+import AllImages from './components/AllImages.vue'; 
+import SearchPage from './components/SearchPage.vue'; 
 const routes = [
-    { path: '/raceimage', component: RaceImage, name:'raceimage'},
+    { path: '/raceimages', component: RaceImages, name:'raceimages'},
     { path: '/homepage', component: HomePage, name:'homepage'},
-   
+    { path: '/allimages', component: AllImages, name:'allimages'},
+    { path: '/searchpage', component: SearchPage, name:'searchpage'}
   ];
 
 const router = createRouter({

@@ -9,7 +9,6 @@
                     <div class="col-lg-3 col-md-3 col-sm-4">    
                         <a href="/">
                             <div id="logo"> </div>
-                            <!-- <img src="../assets/layout_vp_logo.png" /> -->
                         </a>
                     </div>
                     <div class="col-lg-9 col-md-9 col-sm-8 " id="main-menu">  
@@ -41,7 +40,7 @@
                                 <div class="col-sm-9">
                                     <div class="row">
                                         <div class="col-sm-6">
-                                            <select class="form-control" v-model="raceid" ref="select">
+                                            <select class="form-control" v-model="raceid">
                                                 <option v-for="option in options" :value="option.value" v-bind:key="option.value" >
                                                     {{option.text}}
                                                 </option>
@@ -54,7 +53,7 @@
                                 </div>
 
                                 <div class="col-sm-3">
-                                    <button @click="moveToPage" class="btn btn-info form-control" style="color: #FFF">TÌM ẢNH &nbsp;  <i class="fas fa-search"></i> </button>
+                                    <button @click="moveToPage" class="btn btn-info form-control" style="color: #FFF">TÌM ẢNH </button>
                                 </div>
                             </div>
                     
@@ -140,22 +139,6 @@
     margin-bottom: 5px;
     margin-right: 10px;
 }
-
-.fa-search:before {
-    content: "\f002";
-}
-
-.fas {
-    font-weight: 900;
-    font-family: "Font Awesome 5 Free";
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-}
 </style>
 <script setup>
 import {ref} from 'vue';
@@ -172,7 +155,7 @@ const route = useRoute();
 const raceid = ref(options.value[0].value);
 const bib = ref(null);
 function moveToPage(){
-     router.push({name: 'raceimage', query:{raceid: raceid.value, bib:bib.value}});
+     router.push({name: 'raceimages', query:{raceid: raceid.value, bib:bib.value}});
 }
 
 </script>
