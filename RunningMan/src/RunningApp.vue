@@ -1,14 +1,7 @@
 <template>
-  <div>
-    <h1>Longbien Marathon 2022 - Race Photos</h1>
     <div>
-        <a style="cursor: pointer; margin-right: 30px" href="#/Search">Tìm theo BIB</a> |
-        <a href="#/AllImages">Tất cả ảnh</a> 
+         <router-view></router-view>
     </div>
-      <KeepAlive>
-         <component :is="currentView" />
-      </KeepAlive>
-  </div>
 </template>
 
 <style scoped>
@@ -34,39 +27,16 @@
 </style>
 
 <script setup>
-import SearchComponent from "./components/SearchComponent.vue";
-import AllImages from "./components/AllImages.vue";
-import { Fancybox } from "@fancyapps/ui/src/Fancybox/Fancybox.js";
-import { ref, computed } from "vue";
-const routes = {
-  "/": AllImages,
-  "/Search": SearchComponent,
-  "/AllImages": AllImages,
-};
+import { onMounted } from '@vue/runtime-core';
+import { useRouter, useRoute } from 'vue-router';
 
-const currentPath = ref(window.location.hash);
-
-window.addEventListener("hashchange", () => {
-  currentPath.value = window.location.hash;
-});
-
-const currentView = computed(() => {
-  return routes[currentPath.value.slice(1) || "/"] || PageBrokenLink;
-});
-
-Fancybox.bind('[data-fancybox="imggroup"]', {
-  Toolbar: {
-    display: [
-      { id: "prev", position: "center" },
-      { id: "counter", position: "center" },
-      { id: "next", position: "center" },
-      "zoom",
-      "download",
-      "slideshow",
-      "fullscreen",
-      "thumbs",
-      "close",
-    ],
-  },
+onMounted(async() =>{
+  const router = useRouter();
+  const route = useRoute();
+  await router.push({name: 'homepage'}).then(res => {
+    console.log("log ok");
+  })
 });
 </script>
+
+
