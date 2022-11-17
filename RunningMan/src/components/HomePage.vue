@@ -2,9 +2,9 @@
     <div>
       
         <router-view></router-view>
-
-    <div class="container-fluid">
-            <div class="container">
+    <!-- v-bind:style="{ backgroundImage: 'url(' + imagebg + ')' }"> -->
+    <div class="container-fluid" id="main-container" >   
+            <!-- <div class="container">
                 <div class="row">
                     <div class="col-lg-3 col-md-3 col-sm-4">    
                         <a href="/">
@@ -25,12 +25,12 @@
                         </ul>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
             <div id="bib-search">
                 <div class="container">
                     <div class="search-text">
-                        Ghi Nhớ <br> Những <br> Khoảng Khắc
+                         YOUR <br> BEST MOMENTS
                     </div>
                 </div>
 
@@ -53,7 +53,7 @@
                                 </div>
 
                                 <div class="col-sm-3">
-                                    <button @click="moveToPage" class="btn btn-info form-control" style="color: #FFF">TÌM ẢNH </button>
+                                    <button @click="moveToPage" class="form-control" style="background-color: #17b835; color: #FFF">TÌM ẢNH </button>
                                 </div>
                             </div>
                     
@@ -65,11 +65,19 @@
 </template>
 
 <style scoped>
+#main-container { 
+  background: url("/src/assets/DSC_3582h.jpg") no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
 #logo{
     height:80px;
     margin-top: 10px; 
     background-image: url("../assets/layout_vp_logo.png");
-    background-repeat: no-repeat;
+    background-repeat: no-repeat; 
     background-size: contain;
 }
 .nav {
@@ -109,8 +117,8 @@
 
 #bib-search {
     position: relative;
-    background-image: url("../assets/backgroundrepeat.jpg");
-    background-repeat: repeat;
+    /* background-image: url("../assets/backgroundrepeat.jpg");
+    background-repeat: repeat; */
     background-size: 100%;
     height: 1200px;
 }
@@ -128,7 +136,7 @@
     position: absolute;
     top: 240px;
     width: 100%;
-    background-color: rgba(26,26,26,.8);
+    background-color: rgba(200,20,40,.4);
     padding: 40px 0;
 }
 
@@ -152,7 +160,7 @@ const router = useRouter();
 // const route = useRoute(); keep here for code reference later on
 const raceid = ref(1);
 const bib = ref(null);
-
+const imagebg = "/src/assets/DSC_3582h.jpg";
 // first phase in the flow. Load all races
 onMounted(async() => {
   // just a simple fetching, so take it easy here

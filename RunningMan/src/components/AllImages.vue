@@ -1,7 +1,8 @@
 <template>
-    <div>
+    <div id="main-container">
         <div>
-            <h1>Longbien Marathon 2022 - Race Photos</h1>
+            <h3>Longbien Marathon 2022 - Race Photos</h3>
+            <hr/>
             <div>
                 <a style="cursor: pointer; margin-right: 30px" href="#/Search">Tìm theo BIB</a> |
                 <a href="#/AllImages">Tất cả ảnh</a> 

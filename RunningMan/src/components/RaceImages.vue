@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div id="main-container">
     <!-- replace by variable -->
-    <h1>{{raceName}}</h1>
+    <h3>{{raceName}}</h3>
     <div class="container-fluid">
        <div class="row">
-          <div class="col-sm-6">
+          <div class="col-sm-5">
             <div class="row">
                 <div class="col-sm-4">
                     <select class="form-control" v-model="searchType" @change="onSearchTypeChange">
@@ -55,7 +55,10 @@
 </template>
 
 <style scoped>
-
+#main-container h3{
+    border-bottom: 1px solid #CCC;
+    padding-bottom: 10px;
+}
 
 /* Responsive layout - makes a two column-layout instead of four columns */
 @media (max-width: 800px) {
