@@ -164,7 +164,7 @@ const imagebg = "/src/assets/DSC_3582h.jpg";
 // first phase in the flow. Load all races
 onMounted(async() => {
   // just a simple fetching, so take it easy here
-    var apiEndpoint = "http://146.190.192.127:8080/v1/campaign/find";
+    var apiEndpoint = "http://146.190.192.127/v1/campaign/find";
 
    return await axios.get(apiEndpoint , {
     headers:{
