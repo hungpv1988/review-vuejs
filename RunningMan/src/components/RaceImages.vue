@@ -119,7 +119,7 @@ else if (searchType.value == 2) {
 const selectedPage = ref(1);
 
 // setup msg
-const raceName = ref("Longbien Marathon 2022 - Race Photos"); 
+const raceName = ref(""); 
 const totalImagesFound = ref("");
 const yourName = ref("");
 
@@ -252,10 +252,9 @@ async function searchImages(value){
           migrateImagesToState(response.data.images, state, startingPage);
           state.pageCount  = Math.ceil(response.data.total / pageSize);
           currentPage.value = startingPage; // remember .value for currentPage, otherwise, it loses reactivity
-          selectedPage.value = 1;
+          selectedPage.value = 1; // set pagination's first page is 1 in the data list returned.
           totalImagesFound.value = response.data.total;
           yourName.value = (!response.data.name) ? "" : response.data.name ;
-          raceName.value = response.data.campaignName;
       });
 }
 </script>

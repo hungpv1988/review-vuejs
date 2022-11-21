@@ -5,13 +5,10 @@ import Paginate from "vuejs-paginate-next";
 import { createRouter, createWebHistory } from 'vue-router';
 import RaceImages from './components/RaceImages.vue';
 import HomePage from './components/HomePage.vue';
-import AllImages from './components/AllImages.vue'; 
-import SearchPage from './components/SearchPage.vue'; 
+
 const routes = [
     { path: '/raceimages', component: RaceImages, name:'raceimages'},
-    { path: '/homepage', component: HomePage, name:'homepage'},
-    { path: '/allimages', component: AllImages, name:'allimages'},
-    { path: '/searchpage', component: SearchPage, name:'searchpage'}
+    { path: '/', component: HomePage, name:'homepage'}
   ];
 
 const router = createRouter({
