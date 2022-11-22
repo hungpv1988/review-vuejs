@@ -33,9 +33,15 @@ import { useRouter, useRoute } from 'vue-router';
 onMounted(async() =>{
   const router = useRouter();
   const route = useRoute();
-  await router.push({name: 'homepage'}).then(res => {
-    console.log("log ok");
-  })
+
+  // if user is at raceimages, or any other pages, then, press f5, server would return index (this page), 
+  // but url on browser is still the raceimages and in this case, we should keep them at the same page as before pressing f5 (not forward to homepage)
+  if (!window.location.pathname){ 
+    await router.push({name: 'homepage'}).then(res => {
+      console.log("log ok");
+    });
+  }
+
 });
 </script>
 

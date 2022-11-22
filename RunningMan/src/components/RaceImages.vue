@@ -1,5 +1,6 @@
 <template>
   <div id="main-container">
+    <router-view></router-view>
     <!-- replace by variable -->
     <h3>{{raceName}}</h3>
     <div class="container-fluid">
@@ -98,7 +99,7 @@ const objectOfAttrs = {
   class: 'wrapper'
 }
 const route = useRoute();
-
+const router = useRouter();
 //set up default value for searching box
 var raceid = route.query.raceid;
 const searchType = ref(0); // default value of int should be zero, would be setup in the next following lines
@@ -243,7 +244,7 @@ function onSearchTypeChange(event){
  }
 };
 
-async function searchImages(value){
+async function searchImages(){
   // Big question consider to push forward to http://127.0.0.1:5173/raceimages?raceid=25&bib=22424 
   var apiEndpoint = getEndpoint(baseUrl, raceid, searchType.value, searchValue.value); // searchValue, searchType has been bind to bib and relevant search
 
@@ -261,8 +262,7 @@ async function searchImages(value){
           selectedPage.value = 1; // set pagination's first page is 1 in the data list returned.
           totalImagesFound.value = response.data.total;
           yourName.value = (!response.data.name) ? "" : response.data.name ;
-          route.query.bib = searchValue.value;
-  
+          router.push({path: route.fullPath, query:{raceid: route.query.raceid, bib:searchValue.value}});
       });
 }
 </script>

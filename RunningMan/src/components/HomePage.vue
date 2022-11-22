@@ -181,7 +181,11 @@ onMounted(async() => {
 })
 
 function moveToPage(){
-     router.push({name: 'raceimages', query:{raceid: raceid.value, bib:bib.value}});
+    let query = {raceid: raceid.value};
+    if (bib.value){
+        query.bib = bib.value;
+    }
+     router.push({path: '/raceimages', query:query});
 }
 
 </script>
