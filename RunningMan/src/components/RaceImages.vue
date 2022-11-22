@@ -44,7 +44,7 @@
             <div class="row" style="align-items:center;">
                 <TransitionGroup name="list">
                     <div class="col-sm-6 col-md-3 col-lg-2" v-for="item in itemsToBeDisplayed" :key="item.id">
-                        <a data-fancybox="imggroup" v-bind:href="item.imageWithLogoUrl" :data-download-src="item.imageUrl"> 
+                        <a data-fancybox="imggroup" v-bind:href="item.imageWithLogoUrl" :data-download-src="item.imageWithLogoUrl"> 
                             <img v-bind:src="item.thumbnail" class="img-fluid img-thumbnail">
                         </a>
                     </div>
