@@ -44,8 +44,8 @@
             <div class="row" style="align-items:center;">
                 <TransitionGroup name="list">
                     <div class="col-sm-6 col-md-3 col-lg-2" v-for="item in itemsToBeDisplayed" :key="item.id">
-                        <a data-fancybox="imggroup" v-bind:href="item.imageUrl"> 
-                            <img v-bind:src="item.thumbnail " class="img-fluid img-thumbnail">
+                        <a data-fancybox="imggroup" v-bind:href="item.imageWithLogoUrl" :data-download-src="item.imageUrl"> 
+                            <img v-bind:src="item.thumbnail" class="img-fluid img-thumbnail">
                         </a>
                     </div>
                 </TransitionGroup>
@@ -88,11 +88,15 @@
 
 <script setup>
 import { Fancybox } from "@fancyapps/ui/src/Fancybox/Fancybox.js";
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import {computed, onMounted, reactive, ref} from 'vue'
 import {getData, getGlobalConfig} from '../services/DataService'
 import Paginate from "vuejs-paginate-next";
-
+const attrName = 'data-download-src';
+const objectOfAttrs = {
+  "href": 'container',
+  class: 'wrapper'
+}
 const route = useRoute();
 
 //set up default value for searching box
@@ -214,7 +218,8 @@ function migrateImagesToState(items, state, currentPage){
                 state.items.push({
                      id: startIndex, // need to be unique for VueJs, and to query data later on. Id is here is the item index (e.g page 3, second item -> id = (3-1)*10 (pagesize) +2 =22 ) 
                     "thumbnail": element.thumbnail,
-                    "imageUrl": element.imageUrl
+                    "imageUrl": element.imageUrl,
+                    "imageWithLogoUrl": element.imageWithLogoUrl
                 })
                 startIndex++;
             });
@@ -239,6 +244,7 @@ function onSearchTypeChange(event){
 };
 
 async function searchImages(value){
+  // Big question consider to push forward to http://127.0.0.1:5173/raceimages?raceid=25&bib=22424 
   var apiEndpoint = getEndpoint(baseUrl, raceid, searchType.value, searchValue.value); // searchValue, searchType has been bind to bib and relevant search
 
   // clean up old data
@@ -255,6 +261,8 @@ async function searchImages(value){
           selectedPage.value = 1; // set pagination's first page is 1 in the data list returned.
           totalImagesFound.value = response.data.total;
           yourName.value = (!response.data.name) ? "" : response.data.name ;
+          route.query.bib = searchValue.value;
+  
       });
 }
 </script>
