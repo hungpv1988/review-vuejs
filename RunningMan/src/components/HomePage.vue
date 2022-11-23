@@ -37,6 +37,7 @@
                 <div class="search-form">
                     <div class="container"> 
                             <div class="row">
+                                <!-- consider to move to col-md-9, replace sm by md so that button will never lack space -->
                                 <div class="col-sm-9">
                                     <div class="row">
                                         <div class="col-sm-6">
@@ -73,22 +74,22 @@
   background-size: cover;
 }
 
-#logo{
+/* #logo{
     height:80px;
     margin-top: 10px; 
     background-image: url("../assets/layout_vp_logo.png");
     background-repeat: no-repeat; 
     background-size: contain;
-}
-.nav {
+} */
+/* .nav {
     display: flex;
     flex-wrap: wrap;
     padding-left: 0px;
     margin-bottom: 0px;
     list-style: none;
-}
+} */
 
-#main-menu{
+/* #main-menu{
     height: 100px;
     line-height: 82px;
     text-align: right;
@@ -105,15 +106,15 @@
 #main-menu .nav .nav-item {
     padding-left: 20px;
     padding-right: 20px;
-}
+} */
 
-.nav-link {
+/* .nav-link {
     display: block;
     padding: 0.5rem 1rem;
 }
 #main-menu a, #main-menu a:hover, #main-menu a:visited {
     color: #253C82;
-}
+} */
 
 #bib-search {
     position: relative;
@@ -160,7 +161,7 @@ const router = useRouter();
 // const route = useRoute(); keep here for code reference later on
 const raceid = ref(1);
 const bib = ref(null);
-const imagebg = "/src/assets/DSC_3582h.jpg";
+//const imagebg = "/src/assets/DSC_3582h.jpg"; -> no longer use background url. Comment here and not remove line for knowledge
 // first phase in the flow. Load all races
 onMounted(async() => {
   // just a simple fetching, so take it easy here
