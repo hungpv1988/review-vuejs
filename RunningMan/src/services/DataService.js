@@ -4,7 +4,7 @@ import {ref} from "vue";
 export function getGlobalConfig(){
   const startingPage = 1;
   const pageSize = 40;
-  const baseUrl = "http://146.190.192.127/v1/images/search-images"; //?campaignId=1
+  const baseUrl = "http://yourbib.xyz/v1/images/search-images"; //?campaignId=1
  
   return {startingPage, pageSize, baseUrl};
 }
