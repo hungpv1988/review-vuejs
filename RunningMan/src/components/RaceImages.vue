@@ -1,8 +1,17 @@
 <template>
   <div id="main-container">
     <router-view></router-view>
-    <!-- replace by variable -->
-    <h3>{{raceName}}</h3>
+    <div class="container-fluid">
+      <div class="row">
+         <div class="col-sm-9">
+            <span style="font-weight: bold; font-size: 32px; color: gray">{{raceName}}</span>
+         </div> 
+         <div class="col-sm-3">
+              <a href="/" style="font-size: 32px; color: gray"> Home Page </a>
+         </div>
+      </div>
+    </div>
+    <hr>
     <div class="container-fluid">
        <div class="row">
           <div class="col-sm-5">
