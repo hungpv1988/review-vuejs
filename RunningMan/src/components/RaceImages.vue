@@ -4,7 +4,7 @@
     <div class="container-fluid">
       <div class="row">
          <div class="col-sm-9">
-            <span style="font-weight: bold; font-size: 32px; color: gray">{{raceName}}</span>
+            <span style="font-weight: bold; font-size: 32px; color: gray" id="campaign-name">{{raceName}}</span>
          </div> 
          <div class="col-sm-3">
               <a href="/" style="font-size: 32px; color: gray"> Home Page </a>
@@ -17,17 +17,17 @@
           <div class="col-sm-5">
             <div class="row">
                 <div class="col-sm-4">
-                    <select class="form-control" v-model="searchType" @change="onSearchTypeChange">
+                    <select class="form-control" id="search-type" v-model="searchType" @change="onSearchTypeChange">
                       <option value="1">Tất cả ảnh</option>
                       <option value="2">Ảnh theo bib</option>
                     </select>
                    
                 </div>
-                <div class="col-sm-8">  <input class="form-control" :disabled="searchType == 1" type="text" v-model="searchValue"   /></div>
+                <div class="col-sm-8">  <input class="form-control" id="txtBib" :disabled="searchType == 1" type="text" v-model="searchValue"   /></div>
             </div>   
           </div>
           <div class="col-sm-2">
-              <button class="form-control" @click="searchImages">Tìm ảnh</button>
+              <button class="form-control" id="btnSearch" @click="searchImages">Tìm ảnh</button>
           </div>
        </div>
     </div>
@@ -35,9 +35,9 @@
 
       <div id="image-box">
             <div class="row" style="margin-top: 20px;"> 
-                    <div class="col-md-9" style="margin-bottom: 1rem"> Có <strong>{{totalImagesFound}}</strong> ảnh được tìm thấy {{yourName}} </div>
+                    <div class="col-md-9" style="margin-bottom: 1rem" id="statistic-box"> Có <strong>{{totalImagesFound}}</strong> ảnh được tìm thấy {{yourName}} </div>
         
-                    <div class="col-md-3">
+                    <div class="col-md-3" id="paging-box">
                             <!-- page-count must be bound to  either state.total or a computed total. Cannot work with  constant and perhaps, let (but may be, use in wrong way) -->
                     <paginate
                             v-model="selectedPage"
@@ -51,7 +51,7 @@
                     </div> 
             </div>
   
-            <div class="row" style="align-items:center;">
+            <div class="row" style="align-items:center;" id="image-box">
                 <TransitionGroup name="list">
                     <div class="col-sm-6 col-md-3 col-lg-2" v-for="item in itemsToBeDisplayed" :key="item.id">
                         <a data-fancybox="imggroup" v-bind:href="item.imageWithLogoUrl" :data-download-src="item.imageWithLogoUrl"> 
@@ -187,6 +187,17 @@ onMounted(async() => {
               totalImagesFound.value = response.data.total;
               yourName.value = (!response.data.name) ? "" : response.data.name ;
               raceName.value = response.data.campaignName;
+          }) .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
+            // anything goes bad,
+            // you land here with error message
+            // handle the error
+            console.log(error);
+          })
+          .finally(() => {
+           // console.log(error);
+            // if finally() is supported by your login method
+            // you can decide whats next,
+            // the promise is fulfilled/rejected
           });
 })
  
@@ -272,6 +283,18 @@ async function searchImages(){
           totalImagesFound.value = response.data.total;
           yourName.value = (!response.data.name) ? "" : response.data.name ;
           router.push({path: route.fullPath, query:{raceid: route.query.raceid, bib:searchValue.value}});
-      });
+      })
+   .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
+    // anything goes bad,
+    // you land here with error message
+    // handle the error
+    console.log("error");
+  })
+  .finally(() => {
+    //console.log("error");
+    // if finally() is supported by your login method
+    // you can decide whats next,
+    // the promise is fulfilled/rejected
+  });
 }
 </script>
