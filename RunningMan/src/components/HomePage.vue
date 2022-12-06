@@ -153,6 +153,9 @@
 import {ref, onMounted} from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import axios from "axios";  
+import {getCampaigns, getGlobalConfig} from '../services/DataService'
+
+const {campaignsUrl} = getGlobalConfig();
 const options = ref([
                        
 ]);
@@ -165,14 +168,7 @@ const bib = ref(null);
 // first phase in the flow. Load all races
 onMounted(async() => {
   // just a simple fetching, so take it easy here
-    var apiEndpoint = "http://146.190.192.127/v1/campaign/find";
-
-   return await axios.get(apiEndpoint , {
-    headers:{
-      'X-Requested-With': 'XMLHttpRequest',
-      'Access-Control-Allow-Origin' : '*',
-      'Access-Control-Allow-Methods':'GET'
-    }}).then(response => {
+  await getCampaigns(campaignsUrl).then(response => {
               var campaigns = response.data.campaigns;
               campaigns.forEach((item) => {
                 options.value.push({value: item.campaignId, text: item.campaignName});
