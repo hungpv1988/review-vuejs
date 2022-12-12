@@ -103,9 +103,9 @@ describe("HomePage.vue", () => {
     expect(wrapper.html()).toContain('Tất cả ảnh'); // router navigates to raceimage
     expect(wrapper.findComponent(RaceImages).exists()).toBe(true);
     expect(wrapper.html()).toContain(raceName); // router navigates to raceimage
-    expect(currentRoute.query.raceid).equal(raceId);
+    expect(currentRoute.params.raceid).equal(raceId);
     expect(currentRoute.query.bib).toBe(undefined); // no fill big
-    expect(currentRoute.name).equal("raceimages");
+    expect(currentRoute.name).equal("racedetails");
   });
 
   it("should navigate to raceimages with the correct bib filled after clicking on the button", async () => {
@@ -143,9 +143,9 @@ describe("HomePage.vue", () => {
     expect(wrapper.html()).toContain('Tất cả ảnh'); // router navigates to raceimage
     expect(wrapper.findComponent(RaceImages).exists()).toBe(true);
     expect(wrapper.html()).toContain(raceName); // router navigates to raceimage
-    expect(currentRoute.query.raceid).equal(raceId);
+    expect(currentRoute.params.raceid).equal(raceId);
     expect(currentRoute.query.bib).equal(txtBib.element.value);
-    expect(currentRoute.name).equal("raceimages");
+    expect(currentRoute.name).equal("racedetails");
   });
 });
 

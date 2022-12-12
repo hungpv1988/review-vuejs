@@ -1,9 +1,9 @@
 <template>
     <div>
-      
-        <router-view></router-view>
+        <!-- need this for tests to pass. Actually, we can remove router-view -->
+        <router-view></router-view> 
     <!-- v-bind:style="{ backgroundImage: 'url(' + imagebg + ')' }"> -->
-    <div class="container-fluid" id="main-container" >   
+        <div class="container-fluid" id="main-container" >   
             <!-- <div class="container">
                 <div class="row">
                     <div class="col-lg-3 col-md-3 col-sm-4">    
@@ -54,8 +54,8 @@
                                 </div>
 
                                 <div class="col-sm-3">
-                                    <button id="btnMove" @click="moveToPage" class="form-control" style="background-color: #17b835; color: #FFF">TÌM ẢNH </button>
-                                    <a href="/raceimages"> go </a>
+                                    <button id="btnMove" @click="moveToRaceDetails" class="form-control" style="background-color: #17b835; color: #FFF">TÌM ẢNH </button>
+                                    <a href=""> go </a>
                                 </div>
                             </div>
                     
@@ -75,47 +75,6 @@
   background-size: cover;
 }
 
-/* #logo{
-    height:80px;
-    margin-top: 10px; 
-    background-image: url("../assets/layout_vp_logo.png");
-    background-repeat: no-repeat; 
-    background-size: contain;
-} */
-/* .nav {
-    display: flex;
-    flex-wrap: wrap;
-    padding-left: 0px;
-    margin-bottom: 0px;
-    list-style: none;
-} */
-
-/* #main-menu{
-    height: 100px;
-    line-height: 82px;
-    text-align: right;
-    font-size: 20px;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-#main-menu .nav {
-    float:right;
-    margin-right:0px;
-}
-
-#main-menu .nav .nav-item {
-    padding-left: 20px;
-    padding-right: 20px;
-} */
-
-/* .nav-link {
-    display: block;
-    padding: 0.5rem 1rem;
-}
-#main-menu a, #main-menu a:hover, #main-menu a:visited {
-    color: #253C82;
-} */
 
 #bib-search {
     position: relative;
@@ -153,16 +112,16 @@
 <script setup>
 import {ref, onMounted} from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import axios from "axios";  
 import {getCampaigns, getGlobalConfig} from '../services/DataService'
 
+
 const {campaignsUrl} = getGlobalConfig();
-const options = ref([
-                       
+const options = ref([                  
 ]);
 
 const router = useRouter();
 // const route = useRoute(); keep here for code reference later on
+const campaigns = ref([]);
 const raceid = ref(1);
 const bib = ref(null);
 //const imagebg = "/src/assets/DSC_3582h.jpg"; -> no longer use background url. Comment here and not remove line for knowledge
@@ -170,61 +129,53 @@ const bib = ref(null);
 onMounted(async() => {
   // just a simple fetching, so take it easy here
   getCampaigns(campaignsUrl).then(response => {
-    var apiEndpoint = "https://yourbib.xyz/v1/campaign/find";
+    response.data.campaigns
+                 .forEach((item) => {
+                        options.value.push({value: item.campaignId, text: item.campaignName});
 
-   return axios.get(apiEndpoint , {
-    headers:{
-      'X-Requested-With': 'XMLHttpRequest',
-      'Access-Control-Allow-Origin' : '*',
-      'Access-Control-Allow-Methods':'GET'
-    }}).then(response => {
-              var campaigns = response.data.campaigns;
-              campaigns.forEach((item) => {
-                options.value.push({value: item.campaignId, text: item.campaignName});
-              });
-              raceid.value = options.value[0].value;
-          }) 
-    .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
-    // anything goes bad,
-    // you land here with error message
-    // handle the error
-    console.log("error");
+                        // migrate data to campagins here so that we can retrieve alias later on when navigating to racedetails
+                        campaigns.value.push({campaignId: item.campaignId, campaignName: item.campaignName, campaignAlias : item.alias});
+                  });
+    raceid.value = options.value[0].value;
+  })
+  .catch((error) =>{
+    console.log(error);
   })
   .finally(() => {
-    // if finally() is supported by your login method
-    // you can decide whats next,
-    // the promise is fulfilled/rejected
-    console.log("error");
-  })
-})})
+    addMetadataForSharingContent()
+  });
+});
 
-function moveToPage(){
-    let query = {raceid: raceid.value};
+function addMetadataForSharingContent(){
+  
+  setMetaContentAttributeValue('og:url', 'https://yourbib.xyz');
+  setMetaContentAttributeValue('og:title', 'Những khoảnh khắc');
+  setMetaContentAttributeValue('og:image', 'https://yourbib.xyz/assets/DSC_3582h.397183d7.jpg');
+  setMetaContentAttributeValue('og:description', 'Tìm lại những khoảnh khắc rực rỡ nhất');
+  
+  function setMetaContentAttributeValue(property, contentValue){
+      const metaList = document.getElementsByTagName("meta");
+      // find the meta element whose property value is equal to property
+      const element =  metaList.filter((item) => {
+            return item.getAttribute("property") === property;
+      });
+      element.setAttribute("content", contentValue);
+  }
+};
+
+function moveToRaceDetails(){
+    let query = {};
     if (bib.value){
         query.bib = bib.value;
     }
     
-    router.push({path: '/raceimages', query:query}) .then((response) => {
-    // login response success,
-    // save the userdata and token
-    resolve(response) // or return(respone)
-  })
-  .then((response) => {
-    // user data succesfully saved,
-    // and you can do extra check on it
-    // safe to navigate away
-    resolve(reponse) // or return(respone)
-  })
-  .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
-    // anything goes bad,
-    // you land here with error message
-    // handle the error
-  })
-  .finally(() => {
-    // if finally() is supported by your login method
-    // you can decide whats next,
-    // the promise is fulfilled/rejected
-  })
-}
+    const camp = campaigns.value.find(c => c.campaignId === raceid.value);
+    router.push({
+        name: 'racedetails',
+        params: {raceid: raceid.value, racealias: camp.campaignAlias},
+        query: query
+    }).then((response) => {
 
+  });
+}
 </script>
