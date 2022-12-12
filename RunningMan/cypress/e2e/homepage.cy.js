@@ -1,13 +1,13 @@
-describe('homepage', () => {  
+describe('homepage', () => {
+  const baseUrl = Cypress.env('baseUrl') ;
   beforeEach(() => {
-    cy.visit('http://127.0.0.1:5174');
+    cy.visit(baseUrl); // move to configuration
    // those two lines below is to wait for api to return data
    // but with cypress, it has a retry mechanism, so if data is not returned and other commands run fail
    // it would trigger a retry, and assert again. Then, it succeed. So we do not need two lines 
    // But if want to be safe, then, use two lines, and (could be good to move wait to test) add then after wait.
    // cy.intercept('https://yourbib.xyz/v1/campaign/find').as('findCamps');
    // cy.wait('@findCamps');
-  
   });
 
   it('should setup the page succesfully', () => {
@@ -21,13 +21,14 @@ describe('homepage', () => {
   });
 
   it('should succesfully move to race details without bib ', () => {
-    // set selected the second option
+    // set selected the second option as index starts from 0
     const selectedIndex = 1;
     cy.get('#raceList').select(selectedIndex);
     const promise = cy.get('#raceList').invoke('val');
     cy.get('#btnMove').trigger('click');
     promise.then((selectedValue) =>{
-      cy.url().should('include', `/raceimages?raceid=${selectedValue}`);
+      cy.url().should('include', `/races/${selectedValue}`);
+      // perhaps, later on capture all data returned by findCamp, and assert alias as well
     });
   });
 
@@ -40,7 +41,9 @@ describe('homepage', () => {
     const promise = cy.get('#raceList').invoke('val');
     cy.get('#btnMove').trigger('click');
     promise.then((selectedValue) =>{
-      cy.url().should('include', `/raceimages?raceid=${selectedValue}&bib=${bib}`);
+      // perhaps, later on capture all data returned by findCamp, and assert alias as well
+      cy.url().should('include', `/races/${selectedValue}`);
+      cy.url().should('include', `?bib=${bib}`);
     });
   });
 })

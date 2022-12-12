@@ -9,7 +9,8 @@ export function getAllCampaigns(){
           "description": "Happy Ekiden 2022",
           "startLocation": "hà nội",
           "status": 1,
-          "startDate": "2022-12-04 00:00:00.0"
+          "startDate": "2022-12-04 00:00:00.0",
+          "alias": "happyekiden"
         },
         {
           "campaignId": 26,
@@ -18,7 +19,8 @@ export function getAllCampaigns(){
           "description": "Run for a green life (Ocean park 2) 11-2022",
           "startLocation": "hà nội",
           "status": 1,
-          "startDate": "2022-11-20 00:00:00.0"
+          "startDate": "2022-11-20 00:00:00.0",
+          "alias": "green-life"
         },
         {
           "campaignId": 25,
@@ -27,7 +29,8 @@ export function getAllCampaigns(){
           "description": "Ecopark 2022",
           "startLocation": "hà nội",
           "status": 1,
-          "startDate": "2022-11-19 00:00:00.0"
+          "startDate": "2022-11-19 00:00:00.0",
+          "alias": "tre-marathon"
         },
         {
           "campaignId": 28,
@@ -36,7 +39,8 @@ export function getAllCampaigns(){
           "description": "Chạy vì VN không có bạo lực với phụ nữ và trẻ em gái",
           "startLocation": "hà nội",
           "status": 1,
-          "startDate": "2022-02-02 00:00:00.0"
+          "startDate": "2022-02-02 00:00:00.0",
+          "alias": "women-and-children"
         }
       ];
 }

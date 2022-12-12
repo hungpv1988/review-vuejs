@@ -1,5 +1,6 @@
 <template>
   <div id="main-container">
+    <!-- need this for tests to pass. Actually, we can remove router-view -->
     <router-view></router-view>
     <div class="container-fluid">
       <div class="row">
@@ -110,7 +111,7 @@ const objectOfAttrs = {
 const route = useRoute();
 const router = useRouter();
 //set up default value for searching box
-var raceid = route.query.raceid;
+var raceid = route.params.raceid;
 const searchType = ref(0); // default value of int should be zero, would be setup in the next following lines
 const searchValue = ref("*"); // don't set as null. Value cannot be updated. If primitive type: string, int, let's set a default value.
 if (!route.query.bib){
@@ -188,16 +189,10 @@ onMounted(async() => {
               yourName.value = (!response.data.name) ? "" : response.data.name ;
               raceName.value = response.data.campaignName;
           }) .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
-            // anything goes bad,
-            // you land here with error message
-            // handle the error
-            console.log(error);
+
           })
           .finally(() => {
-           // console.log(error);
-            // if finally() is supported by your login method
-            // you can decide whats next,
-            // the promise is fulfilled/rejected
+
           });
 })
  
@@ -255,14 +250,14 @@ function isDataPageNotLoadedBefore(pageNumber) {
 }
 
 //searchType change, we might need to setup againt searchValu as it has a default value for searchType 01
-function onSearchTypeChange(event){
+async function onSearchTypeChange(event){
  if (event.currentTarget.value == "1") {// searchType for race
     searchValue.value = "*";
  }
  else {
     searchValue.value = "";
- }
-};
+  }
+}
 
 async function searchImages(){
   // Big question consider to push forward to http://127.0.0.1:5173/raceimages?raceid=25&bib=22424 
@@ -282,19 +277,21 @@ async function searchImages(){
           selectedPage.value = 1; // set pagination's first page is 1 in the data list returned.
           totalImagesFound.value = response.data.total;
           yourName.value = (!response.data.name) ? "" : response.data.name ;
-          router.push({path: route.fullPath, query:{raceid: route.query.raceid, bib:searchValue.value}});
       })
    .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
-    // anything goes bad,
-    // you land here with error message
-    // handle the error
-    console.log("error");
-  })
+
+   })
   .finally(() => {
-    //console.log("error");
-    // if finally() is supported by your login method
-    // you can decide whats next,
-    // the promise is fulfilled/rejected
-  });
+      let query = {};
+      if (searchValue.value != '*'){
+        query.bib = searchValue.value; 
+      };
+      
+      router.push({
+        path: route.fullPath,
+        params: route.params,
+        query: query
+      });
+   });
 }
 </script>

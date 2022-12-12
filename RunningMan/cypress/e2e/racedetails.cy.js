@@ -1,12 +1,22 @@
 describe('racedetails', () => {  
-
+  const baseUrl = Cypress.env('baseUrl'),
+        getCampsUrl = Cypress.env('getCampsUrl'),
+        searchImagesUrl = Cypress.env('searchImagesUrl') ; 
   let numberofPage, campName, total;
   const numberOfItemsPerPage = 40; // need to be in sync with code
   beforeEach(() => {
-    cy.intercept('https://yourbib.xyz/v1/images/search-images*').as('searchImages');
-    cy.visit('http://127.0.0.1:5174');
-    cy.intercept('https://yourbib.xyz/v1/campaign/find').as('findCamps');
+    // should intercept and set alias before visiting the page because if visit the page, and set alias, then wait
+    // so, in some cases, response is returned so quickly, so the flow is stuck because of cy.wait as it runs forever as the request is complete & no more one is made
+    // https://egghead.io/blog/intercepting-network-requests-in-cypress
+    // perhaps, if make a second call to request, need to use alias again and call wait command one more time (the same as the first one).
+    cy.intercept(`${searchImagesUrl}*`).as('searchImages');
+    cy.intercept(getCampsUrl).as('findCamps');
+    cy.visit(baseUrl); // move to configuration
  
+    //cy.intercept('https://yourbib.xyz/v1/images/search-images*').as('searchImages');
+    //cy.visit('http://127.0.0.1:5174');
+    //cy.intercept('https://yourbib.xyz/v1/campaign/find').as('findCamps');
+
     // default value of combo is 1 (wrong code, but not good time to fix) before fetching data
     // so we need to wait here for data to be loaded as a fix.
     cy.wait('@findCamps');
@@ -31,7 +41,7 @@ describe('racedetails', () => {
     // we can get the current active a, then, setup to click on the next page, or next button
     // but no familiar with the framework yet, so setup looks complicated
     const nextPage = 2;
-    cy.intercept('Get','https://yourbib.xyz/v1/images/search-images*', (req)=>{
+    cy.intercept('Get',`${searchImagesUrl}*`, (req)=>{
       expect(parseInt(req.query.page)).to.equal(nextPage);
     });
     
@@ -48,8 +58,7 @@ describe('racedetails', () => {
     cy.get('#search-type').select(bibSearchingType); 
     cy.get('#txtBib').type(bib); 
     cy.get('#btnSearch').click(); 
-    cy.intercept('Get','https://yourbib.xyz/v1/images/search-images*', (req)=>{
-      debugger;
+    cy.intercept('Get',`${searchImagesUrl}*`, (req)=>{
       expect(parseInt(req.query.bib)).to.equal(bib); // make sure that bib is sent
       req.continue((res) => {
         expect(res.body.campaignName).to.equal(campName);
@@ -66,9 +75,10 @@ describe('racedetails', () => {
   it('should search according to bib with a specific case', () => {
     // revisit page, and choose happy ekiden
     const happyEkidenId = 32;
-    cy.intercept('https://yourbib.xyz/v1/images/search-images*').as('searchImages');
-    cy.visit('http://127.0.0.1:5174');
-    cy.intercept('https://yourbib.xyz/v1/campaign/find').as('findCamps');
+    cy.intercept(`${searchImagesUrl}*`).as('searchImages');
+    cy.intercept(getCampsUrl).as('findCamps');
+    cy.visit(baseUrl);
+    
     cy.wait('@findCamps');
     cy.get('#raceList').select(happyEkidenId.toString())//
     cy.get('#btnMove').click();

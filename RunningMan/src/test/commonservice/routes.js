@@ -3,7 +3,7 @@ import RaceImages from "../../components/RaceImages.vue"
 
 export default [
   { path: "/", component: HomePage, name:'homepage' },
-  { path: "/raceimages", component: RaceImages, name:'raceimages' }
+  { path: '/races/:raceid/:racealias', component: RaceImages, name:'racedetails'}
 ]
 
 
