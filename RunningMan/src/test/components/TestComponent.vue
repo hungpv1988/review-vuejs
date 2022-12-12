@@ -1,7 +1,7 @@
 <template>
     <div>
       
-        <router-view></router-view>
+ 
     <!-- v-bind:style="{ backgroundImage: 'url(' + imagebg + ')' }"> -->
     <div class="container-fluid" id="main-container" >   
             <!-- <div class="container">
@@ -33,7 +33,8 @@
                          YOUR <br> BEST MOMENTS
                     </div>
                 </div>
-
+                
+                <input id="txtTest" v-model="testText" type="text" />
                 <div class="search-form">
                     <div class="container"> 
                             <div class="row">
@@ -45,6 +46,12 @@
                                                 <option v-for="option in options" :value="option.value" v-bind:key="option.value" >
                                                     {{option.text}}
                                                 </option>
+                                                  <!-- <option value="1"  >
+                                                    1
+                                                </option>
+                                                <option value="2"  >
+                                                    2
+                                                </option> -->
                                             </select>
                                         </div>
                                         <div class="col-sm-6">
@@ -55,7 +62,6 @@
 
                                 <div class="col-sm-3">
                                     <button id="btnMove" @click="moveToPage" class="form-control" style="background-color: #17b835; color: #FFF">TÌM ẢNH </button>
-                                    <a href="/raceimages"> go </a>
                                 </div>
                             </div>
                     
@@ -152,79 +158,36 @@
 </style>
 <script setup>
 import {ref, onMounted} from 'vue';
-import { useRouter, useRoute } from 'vue-router';
 import axios from "axios";  
-import {getCampaigns, getGlobalConfig} from '../services/DataService'
-
-const {campaignsUrl} = getGlobalConfig();
 const options = ref([
                        
 ]);
 
-const router = useRouter();
+const testText = ref("*");
+
 // const route = useRoute(); keep here for code reference later on
 const raceid = ref(1);
-const bib = ref(null);
+
 //const imagebg = "/src/assets/DSC_3582h.jpg"; -> no longer use background url. Comment here and not remove line for knowledge
 // first phase in the flow. Load all races
 onMounted(async() => {
   // just a simple fetching, so take it easy here
-  getCampaigns(campaignsUrl).then(response => {
-    var apiEndpoint = "https://yourbib.xyz/v1/campaign/find";
+    var apiEndpoint = "https://yourbib.xyz/v1/campaign/find/test";
 
-   return axios.get(apiEndpoint , {
+   return await axios.get(apiEndpoint , {
     headers:{
       'X-Requested-With': 'XMLHttpRequest',
       'Access-Control-Allow-Origin' : '*',
       'Access-Control-Allow-Methods':'GET'
     }}).then(response => {
-              var campaigns = response.data.campaigns;
-              campaigns.forEach((item) => {
-                options.value.push({value: item.campaignId, text: item.campaignName});
-              });
-              raceid.value = options.value[0].value;
-          }) 
-    .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
-    // anything goes bad,
-    // you land here with error message
-    // handle the error
-    console.log("error");
-  })
-  .finally(() => {
-    // if finally() is supported by your login method
-    // you can decide whats next,
-    // the promise is fulfilled/rejected
-    console.log("error");
-  })
-})})
-
-function moveToPage(){
-    let query = {raceid: raceid.value};
-    if (bib.value){
-        query.bib = bib.value;
-    }
-    
-    router.push({path: '/raceimages', query:query}) .then((response) => {
-    // login response success,
-    // save the userdata and token
-    resolve(response) // or return(respone)
-  })
-  .then((response) => {
-    // user data succesfully saved,
-    // and you can do extra check on it
-    // safe to navigate away
-    resolve(reponse) // or return(respone)
-  })
-  .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
-    // anything goes bad,
-    // you land here with error message
-    // handle the error
-  })
-  .finally(() => {
-    // if finally() is supported by your login method
-    // you can decide whats next,
-    // the promise is fulfilled/rejected
-  })
-}
-
+            //   var campaigns = response.data.campaigns;
+            //   console.log(campaigns);
+            //   campaigns.forEach((item) => {
+            //     options.value.push({value: item.campaignId, text: item.campaignName});
+            //   });
+            //   raceid.value = options.value[0].value;
+           // debugger;
+             testText.value = response.data.message;
+          });
+})
 </script>
