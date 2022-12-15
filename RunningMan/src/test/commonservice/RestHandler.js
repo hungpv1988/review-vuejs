@@ -36,7 +36,7 @@ export default [
         });
     };
     
-    /* fail to do. bib === 1 false, but still enter if else.
+    /* fail to do. bib === 1 false, but still enter if else. -> move this test to end-to-end
     if (bib === 1){
       returnedImages.push(images[0]);// =  images.slice(0, 50);
       returnedImages.push(images[1]);

@@ -1,27 +1,36 @@
 import { mount, flushPromises } from "@vue/test-utils";
 import HomePage from "src/components/HomePage.vue";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import {setupMockServerForFindCampaignRest} from '../commonservice/MockServer';
 import {mockConstant} from '../commonservice/MockConstant';
 import routes from '../commonservice/routes';
 import { createRouter, createWebHistory } from 'vue-router';
 import {getGlobalConfig} from '../../services/DataService';
+import {getAllCampaigns} from '../commonservice/mockDataService';
 import {nextTick} from 'vue';
 
 
 setupMockServerForFindCampaignRest();
 
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+});
+
+const allCamp = getAllCampaigns();
+var raceName = allCamp[0].campaignName;
+var campId = allCamp[0].campaignId; 
 
 describe("raceimages.vue", () => {
-  it("should render as expected when simply moving to raceimage from home without bib", async () => {
-    const router = createRouter({
-      history: createWebHistory(),
-      routes
-    })
-    router.push('/');
+  beforeEach(async () => {
+    const query = {raceid: campId}; // first race is 32, and mocked in handler to return data
+    router.push({path: '/raceimages', query:query});
     await router.isReady();
     await flushPromises();
+  });
 
+  // should render as expected when visit with bib, but can move to end-to-end
+  it("should render as expected when visit raceimage without bib", async () => {
     const wrapper = mount(HomePage, {
       global: {
         plugins: [router]
@@ -29,17 +38,7 @@ describe("raceimages.vue", () => {
     });
     await flushPromises();
       
-    var btnMove = await wrapper.find("#btnMove");
-    var cbRaces = await wrapper.find("#raceList") ;    
-    cbRaces.setValue(cbRaces.element.options[0].value); // 32
-    await btnMove.trigger('click');
-    await nextTick();
-    await flushPromises();
-    
-    //assert
     var currentRoute = router.currentRoute.value;
-    var raceName = cbRaces.element.options[0].text;
-    var campId = cbRaces.element.value;
     var imgs = wrapper.find("#image-box").findAll("img");
     const apiConstants = mockConstant();
     var allImagesReturnedFromApi = campId * apiConstants.multipler; // in MockDataService, we return campId * 4 images
@@ -64,32 +63,17 @@ describe("raceimages.vue", () => {
     expect(wrapper.find('#paging-box').text()).toContain(Math.ceil(allImagesReturnedFromApi/ pageSize)); 
 
     // url
-    expect(currentRoute.query.raceid).equal(campId);
+    expect(parseInt(currentRoute.query.raceid)).equal(campId);
     expect(currentRoute.query.bib).toBe(undefined); // no fill bib
     expect(currentRoute.name).equal("raceimages");
   });
 
-  it("should move to the page selected", async () => {
-    const router = createRouter({
-      history: createWebHistory(),
-      routes
-    })
-    router.push('/');
-    await router.isReady();
-    await flushPromises();
-
+  it("should paginate as expected", async () => {
     const wrapper = mount(HomePage, {
       global: {
         plugins: [router]
       }
     });
-    
-    await flushPromises();
-      
-    var btnMove = await wrapper.find("#btnMove");
-    var cbRaces = await wrapper.find("#raceList") ;    
-    cbRaces.setValue(cbRaces.element.options[0].value); // 32
-    await btnMove.trigger('click');
     await flushPromises();
 
     const allPageItem = wrapper.findAll(".page-item").length; // pre 1 2 3 .... last_page next
@@ -115,50 +99,37 @@ describe("raceimages.vue", () => {
     expect(wrapper.findAll(".page-item")[allPageItem-2].classes()).toContain("active"); //  last page is active now
   });
 
-  // fail to make this work. Take too much time and effort so give up
-  it.skip("search bib should be succesful", async () => {
-    const router = createRouter({
-      history: createWebHistory(),
-      routes
-    })
-    router.push('/');
-    await router.isReady();
-    await flushPromises();
- 
-
-
+  // fail to make this work. Take too much time and effort so give up -> should move to end-to-end
+  // should use this test to validate component interaction
+  it("should behave as expected when component interacts with each other", async () => {
     const wrapper =  mount(HomePage, {
       global: {
         plugins: [router]
       }
     });
-
-    await flushPromises();
-
-     var btnMove = await wrapper.find("#btnMove");
-     var cbCampagin = await wrapper.find("#raceList") ;    
-     cbCampagin.setValue(cbCampagin.element.options[0].value); // id = 32, want to access camp 32
-     await btnMove.trigger('click');
-    //router.push({path: '/raceimages', query:{raceid: cbCampagin.element.options[0].value, bib:2}});
-    
     await flushPromises();
     var txtBib = await wrapper.find("#txtBib") ; 
     expect(txtBib.element.disabled).toBe(true);
+    expect(txtBib.element.value).toBe("*");
+    
     var cbSearchType = await wrapper.find("#search-type") ;    
     cbSearchType.setValue(cbSearchType.element.options[1].value); // search by bib
     txtBib = await wrapper.find("#txtBib") ; 
-    expect(txtBib.element.disabled).toBe(false);
+    expect(txtBib.element.disabled).toBe(false); 
     await txtBib.setValue('4'); // see the list of supported bib in MockConstant
-    await flushPromises();
-    
-    
+
+    cbSearchType.setValue(cbSearchType.element.options[0].value); // search by bib
+    txtBib = await wrapper.find("#txtBib") ; 
+    expect(txtBib.element.disabled).toBe(true);
+    expect(txtBib.element.value).toBe("*");
+
+    // should navigate to races?bib=4
     await wrapper.find("#btnSearch").trigger('click');
-
-   
     await flushPromises();
-    
-
-    expect(wrapper.find('#statistic-box').text()).toContain(100); // all images
-  }, 10000);
+    var currentRoute = router.currentRoute.value;
+    expect(currentRoute.query.bib).equal(txtBib.element.value);
+  });
 });
+
+
 

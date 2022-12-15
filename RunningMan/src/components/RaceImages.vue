@@ -33,7 +33,7 @@
     </div>
    
 
-      <div id="image-box">
+      <div id="main-box">
             <div class="row" style="margin-top: 20px;"> 
                     <div class="col-md-9" style="margin-bottom: 1rem" id="statistic-box"> Có <strong>{{totalImagesFound}}</strong> ảnh được tìm thấy {{yourName}} </div>
         
