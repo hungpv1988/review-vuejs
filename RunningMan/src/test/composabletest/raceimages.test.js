@@ -7,7 +7,7 @@ import routes from '../commonservice/routes';
 import { createRouter, createWebHistory } from 'vue-router';
 import {getGlobalConfig} from '../../services/DataService';
 import {getAllCampaigns} from '../commonservice/mockDataService';
-import {nextTick} from 'vue';
+
 
 
 setupMockServerForFindCampaignRest();
@@ -18,13 +18,18 @@ const router = createRouter({
 });
 
 const allCamp = getAllCampaigns();
-var raceName = allCamp[0].campaignName;
-var campId = allCamp[0].campaignId; 
+var raceName = allCamp[0].campaignName,
+    raceId = allCamp[0].campaignId,
+    raceAlias = allCamp[0].alias;
 
-describe("raceimages.vue", () => {
+describe("races.vue", () => {
   beforeEach(async () => {
-    const query = {raceid: campId}; // first race is 32, and mocked in handler to return data
-    router.push({path: '/raceimages', query:query});
+  //  const query = {raceid: raceId}; // first race is 32, and mocked in handler to return data
+    router.push(
+      {
+        name: 'racedetails', 
+        params: {raceid: raceId, racealias: raceAlias},
+      });
     await router.isReady();
     await flushPromises();
   });
@@ -41,7 +46,7 @@ describe("raceimages.vue", () => {
     var currentRoute = router.currentRoute.value;
     var imgs = wrapper.find("#image-box").findAll("img");
     const apiConstants = mockConstant();
-    var allImagesReturnedFromApi = campId * apiConstants.multipler; // in MockDataService, we return campId * 4 images
+    var allImagesReturnedFromApi = raceId * apiConstants.multipler; // in MockDataService, we return campId * 4 images
     var pageSize = getGlobalConfig().pageSize; // 40
     
     // number of image dispalyed, total images, & campaign name.
@@ -62,10 +67,11 @@ describe("raceimages.vue", () => {
     expect(wrapperText).toContain(numeberOfPage); //...
     expect(wrapper.find('#paging-box').text()).toContain(Math.ceil(allImagesReturnedFromApi/ pageSize)); 
 
-    // url
-    expect(parseInt(currentRoute.query.raceid)).equal(campId);
+   // expect(parseInt(currentRoute.query.raceid)).equal(campId);
+    expect(parseInt(currentRoute.params.raceid)).equal(raceId);
+
     expect(currentRoute.query.bib).toBe(undefined); // no fill bib
-    expect(currentRoute.name).equal("raceimages");
+    expect(currentRoute.name).equal("racedetails");
   });
 
   it("should paginate as expected", async () => {
@@ -112,18 +118,18 @@ describe("raceimages.vue", () => {
     expect(txtBib.element.disabled).toBe(true);
     expect(txtBib.element.value).toBe("*");
     
-    var cbSearchType = await wrapper.find("#search-type") ;    
-    cbSearchType.setValue(cbSearchType.element.options[1].value); // search by bib
-    txtBib = await wrapper.find("#txtBib") ; 
-    expect(txtBib.element.disabled).toBe(false); 
-    await txtBib.setValue('4'); // see the list of supported bib in MockConstant
-
+    // test interaction when search all image
+    var cbSearchType = await wrapper.find("#search-type") ;   
     cbSearchType.setValue(cbSearchType.element.options[0].value); // search by bib
     txtBib = await wrapper.find("#txtBib") ; 
     expect(txtBib.element.disabled).toBe(true);
     expect(txtBib.element.value).toBe("*");
 
-    // should navigate to races?bib=4
+    // test interaction when search by bib
+    cbSearchType.setValue(cbSearchType.element.options[1].value); // search by bib
+    txtBib = await wrapper.find("#txtBib") ; 
+    expect(txtBib.element.disabled).toBe(false); 
+    await txtBib.setValue('4'); // see the list of supported bib in MockConstant
     await wrapper.find("#btnSearch").trigger('click');
     await flushPromises();
     var currentRoute = router.currentRoute.value;

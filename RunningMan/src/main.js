@@ -9,8 +9,8 @@ import HomePage from './components/HomePage.vue';
 // params are ignored if path present
 // https://stackoverflow.com/questions/40382388/how-to-set-url-query-params-in-vue-with-vue-router
 const routes = [
-    { path: '/raceimages', component: RaceImages, name:'raceimages'},
-    { path: '/', component: HomePage, name:'homepage'}
+    { path: '/', component: HomePage, name:'homepage'},
+    { path: '/races/:raceid/:racealias', component: RaceImages, name:'racedetails'}
   ];
 
 const router = createRouter({
