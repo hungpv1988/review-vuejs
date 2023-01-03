@@ -192,10 +192,42 @@ onMounted(async() => {
 
           })
           .finally(() => {
-
+              addMetadataForSharingContent();
           });
 })
- 
+
+function addMetadataForSharingContent(){
+  const bib = route.query.bib;
+  const url =  'https://yourbib.xyz/raceimages?raceid='+ ( (bib) ? raceid + '&bib='+bib : raceid);
+  
+  setMetaContentAttributeValue('og:url', url);
+  setMetaContentAttributeValue('og:title', raceName.value);
+  // just need to call this function when loading the page & the url of first item of state would be chosen 
+      // if bib is not present, the first item is chosen at first. Later on, if clients search by bib
+                            //  then, bib would appear on url, and if clients paste the current link (with bib)
+                            // the page is load and this time, bib is on url so all images by bib is returned
+                            // and state would only store images by bib, then first item is ok
+      // bib is present, then state only store images by bib, so first item is ok
+  setMetaContentAttributeValue('og:image', state.items[0].thumbnail);
+  setMetaContentAttributeValue('og:description', raceName.value);
+  
+  function setMetaContentAttributeValue(property, contentValue){
+      const metaList = document.getElementsByTagName("meta");
+      // find the meta element whose property value is equal to property
+      const element = findMetaElementByProperty(property);
+      element.setAttribute("content", contentValue);
+
+      function findMetaElementByProperty(property){
+          // find the meta element whose property value is equal to property
+          for(let i = 0; i< metaList.length; i++){
+              if (metaList[i].getAttribute("property") === property ){
+                return metaList[i];
+              }
+          }
+      }
+  };
+};
+
 // when users click on a page 
 async function Paging(pageNumber){
   //if we do not have an item at the beginning of the page, meaning that the clients have not accessed the page already, so  need to make a requet to api

@@ -142,9 +142,25 @@ onMounted(async() => {
     console.log(error);
   })
   .finally(() => {
-
+    addMetadataForSharingContent()
   });
 });
+
+function addMetadataForSharingContent(){
+  setMetaContentAttributeValue('og:url', 'https://yourbib.xyz');
+  setMetaContentAttributeValue('og:title', 'Những khoảnh khắc');
+  setMetaContentAttributeValue('og:image', 'https://yourbib.xyz/assets/DSC_3582h.397183d7.jpg');
+  setMetaContentAttributeValue('og:description', 'Tìm lại những khoảnh khắc rực rỡ nhất');
+  
+  function setMetaContentAttributeValue(property, contentValue){
+      const metaList = document.getElementsByTagName("meta");
+      // find the meta element whose property value is equal to property
+      const element =  metaList.filter((item) => {
+            return item.getAttribute("property") === property;
+      });
+      element.setAttribute("content", contentValue);
+  }
+};
 
 function moveToRaceDetails(){
     let query = {};
