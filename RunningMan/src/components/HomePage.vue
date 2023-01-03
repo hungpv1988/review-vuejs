@@ -147,7 +147,6 @@ onMounted(async() => {
 });
 
 function addMetadataForSharingContent(){
-  
   setMetaContentAttributeValue('og:url', 'https://yourbib.xyz');
   setMetaContentAttributeValue('og:title', 'Những khoảnh khắc');
   setMetaContentAttributeValue('og:image', 'https://yourbib.xyz/assets/DSC_3582h.397183d7.jpg');
