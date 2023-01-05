@@ -143,33 +143,9 @@ onMounted(async() => {
     console.log(error);
   })
   .finally(() => {
-    addMetadataForSharingContent()
+    // should add metadata for sharing content here, but fb does not execute so that the code segment has been deleted, see git commit to take code if needed
   });
 });
-
-function addMetadataForSharingContent(){
-  //console.log('full path = ' + route.fullPath);
-  setMetaContentAttributeValue('og:url', 'https://yourbib.xyz');
-  setMetaContentAttributeValue('og:title', 'Những khoảnh khắc');
-  setMetaContentAttributeValue('og:image', 'https://yourbib.xyz/assets/DSC_3582h.397183d7.jpg');
-  setMetaContentAttributeValue('og:description', 'Tìm lại những khoảnh khắc rực rỡ nhất');
-  
- function setMetaContentAttributeValue(property, contentValue){
-      const metaList = document.getElementsByTagName("meta");
-      // find the meta element whose property value is equal to property
-      const element = findMetaElementByProperty(property);
-      element.setAttribute("content", contentValue);
-
-      function findMetaElementByProperty(property){
-          // find the meta element whose property value is equal to property
-          for(let i = 0; i< metaList.length; i++){
-              if (metaList[i].getAttribute("property") === property ){
-                return metaList[i];
-              }
-          }
-      }
-  };
-};
 
 function moveToRaceDetails(){
     let query = {};
