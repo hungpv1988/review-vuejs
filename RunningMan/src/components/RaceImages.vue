@@ -33,35 +33,34 @@
        </div>
     </div>
    
-
-      <div id="main-box">
-            <div class="row" style="margin-top: 20px;"> 
-                    <div class="col-md-9" style="margin-bottom: 1rem" id="statistic-box"> Có <strong>{{totalImagesFound}}</strong> ảnh được tìm thấy {{yourName}} </div>
-        
-                    <div class="col-md-3" id="paging-box">
-                            <!-- page-count must be bound to  either state.total or a computed total. Cannot work with  constant and perhaps, let (but may be, use in wrong way) -->
-                    <paginate
-                            v-model="selectedPage"
-                            :page-count="state.pageCount"
-                            :click-handler="Paging"
-                            :prev-text="'Prev'"
-                            :next-text="'Next'"
-                            :page-class="'page-item'"
-                            >
-                            </paginate>
-                    </div> 
-            </div>
-  
-            <div class="row" style="align-items:center;" id="image-box">
-                <TransitionGroup name="list">
-                    <div class="col-sm-6 col-md-3 col-lg-2" v-for="item in itemsToBeDisplayed" :key="item.id">
-                        <a data-fancybox="imggroup" v-bind:href="item.imageWithLogoUrl" :data-download-src="item.imageWithLogoUrl"> 
-                            <img v-bind:src="item.thumbnail" class="img-fluid img-thumbnail">
-                        </a>
-                    </div>
-                </TransitionGroup>
-            </div>
+    <div id="main-box">
+        <div class="row" style="margin-top: 20px;"> 
+                <div class="col-md-9" style="margin-bottom: 1rem" id="statistic-box"> Có <strong>{{totalImagesFound}}</strong> ảnh được tìm thấy</div>
+    
+                <div class="col-md-3" id="paging-box">
+                        <!-- page-count must be bound to  either state.total or a computed total. Cannot work with  constant and perhaps, let (but may be, use in wrong way) -->
+                <paginate
+                        v-model="selectedPage"
+                        :page-count="state.pageCount"
+                        :click-handler="Paging"
+                        :prev-text="'Prev'"
+                        :next-text="'Next'"
+                        :page-class="'page-item'"
+                        >
+                        </paginate>
+                </div> 
         </div>
+  
+        <div class="row" style="align-items:center;" id="image-box">
+            <TransitionGroup name="list">
+                <div class="col-sm-6 col-md-3 col-lg-2" v-for="item in itemsToBeDisplayed" :key="item.id">
+                    <a data-fancybox="imggroup" v-bind:href="item.imageWithLogoUrl" :data-download-src="item.imageWithLogoUrl"> 
+                        <img v-bind:src="item.thumbnail" class="img-fluid img-thumbnail">
+                    </a>
+                </div>
+            </TransitionGroup>
+        </div>
+    </div>
   </div>
 </template>
 
@@ -136,7 +135,6 @@ const selectedPage = ref(1);
 // setup msg
 const raceName = ref(""); 
 const totalImagesFound = ref("");
-const yourName = ref("");
 
 // setup fancy box
 Fancybox.bind('[data-fancybox="imggroup"]', {
@@ -186,47 +184,15 @@ onMounted(async() => {
               state.pageCount = Math.ceil(response.data.total / pageSize);
               currentPage.value = startingPage; // remember .value for currentPage, otherwise, it loses reactivity
               totalImagesFound.value = response.data.total;
-              yourName.value = (!response.data.name) ? "" : response.data.name ;
               raceName.value = response.data.campaignName;
           }) .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
 
           })
           .finally(() => {
-              addMetadataForSharingContent();
+            // should add metadata for sharing content here, but fb does not execute so that the code segment has been deleted, see git commit to take code if needed
           });
 })
 
-function addMetadataForSharingContent(){
-  const bib = route.query.bib;
-  const url =  'https://yourbib.xyz/raceimages?raceid='+ ( (bib) ? raceid + '&bib='+bib : raceid);
-  
-  setMetaContentAttributeValue('og:url', url);
-  setMetaContentAttributeValue('og:title', raceName.value);
-  // just need to call this function when loading the page & the url of first item of state would be chosen 
-      // if bib is not present, the first item is chosen at first. Later on, if clients search by bib
-                            //  then, bib would appear on url, and if clients paste the current link (with bib)
-                            // the page is load and this time, bib is on url so all images by bib is returned
-                            // and state would only store images by bib, then first item is ok
-      // bib is present, then state only store images by bib, so first item is ok
-  setMetaContentAttributeValue('og:image', state.items[0].thumbnail);
-  setMetaContentAttributeValue('og:description', raceName.value);
-  
-  function setMetaContentAttributeValue(property, contentValue){
-      const metaList = document.getElementsByTagName("meta");
-      // find the meta element whose property value is equal to property
-      const element = findMetaElementByProperty(property);
-      element.setAttribute("content", contentValue);
-
-      function findMetaElementByProperty(property){
-          // find the meta element whose property value is equal to property
-          for(let i = 0; i< metaList.length; i++){
-              if (metaList[i].getAttribute("property") === property ){
-                return metaList[i];
-              }
-          }
-      }
-  };
-};
 
 // when users click on a page 
 async function Paging(pageNumber){
@@ -261,6 +227,10 @@ const itemsToBeDisplayed = computed(() =>{
 )
 
 function migrateImagesToState(items, state, currentPage){
+    if (!items ||(items.length ==0)){
+      return;
+    } 
+
     var startIndex = (currentPage-1) * pageSize;
     items.forEach( (element) => {
                 state.items.push({
@@ -308,7 +278,6 @@ async function searchImages(){
           currentPage.value = startingPage; // remember .value for currentPage, otherwise, it loses reactivity
           selectedPage.value = 1; // set pagination's first page is 1 in the data list returned.
           totalImagesFound.value = response.data.total;
-          yourName.value = (!response.data.name) ? "" : response.data.name ;
       })
    .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
 
