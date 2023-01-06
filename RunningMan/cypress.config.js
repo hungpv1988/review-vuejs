@@ -7,7 +7,7 @@ module.exports = defineConfig({
     },
   },
   env: {
-    baseUrl: 'http://127.0.0.1:5174',
+    baseUrl: 'http://localhost:5174',
     getCampsUrl : 'https://yourbib.xyz/v1/campaign/find',
     searchImagesUrl : 'https://yourbib.xyz/v1/images/search-images'
   }
