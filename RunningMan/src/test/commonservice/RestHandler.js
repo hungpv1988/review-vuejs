@@ -4,7 +4,7 @@ import {mockConstant} from './MockConstant'
 
 export default [
   // findCampaignTest handler
-  rest.get('https://yourbib.xyz/v1/campaign/find/test', (req, res, ctx) => {
+  rest.get('https://timanh.com/v1/campaign/find/test', (req, res, ctx) => {
     return res(
       ctx.json({
         message: 'it works :)'
@@ -13,14 +13,14 @@ export default [
   }),
 
   // findCampaign handler
-  rest.get('https://yourbib.xyz/v1/campaign/find', (req, res, ctx) => {
+  rest.get('https://timanh.com/v1/campaign/find', (req, res, ctx) => {
     var campaigns = getAllCampaigns();
     return res(ctx.status(200), ctx.json({
      "campaigns": campaigns
     }))
   }),
 
- rest.get('https://yourbib.xyz/v1/images/search-images', (req, res, ctx) => {
+ rest.get('https://timanh.com/v1/images/search-images', (req, res, ctx) => {
     const campaignId = req.url.searchParams.get('campaignId');
     const bib = req.url.searchParams.has('bib') ? req.url.searchParams.get('bib') : null;
     const page = req.url.searchParams.get('page');

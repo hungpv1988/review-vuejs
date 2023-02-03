@@ -4,8 +4,8 @@ import {ref} from "vue";
 export function getGlobalConfig(){
   const startingPage = 1;
   const pageSize = 40;
-  const baseUrl = "https://yourbib.xyz/v1/images/search-images"; //?campaignId=1
-  const campaignsUrl = "https://yourbib.xyz/v1/campaign/find";
+  const baseUrl = "https://timanh.com/v1/images/search-images"; //?campaignId=1
+  const campaignsUrl = "https://timanh.com/v1/campaign/find";
 
   return {startingPage, pageSize, baseUrl, campaignsUrl};
 }
