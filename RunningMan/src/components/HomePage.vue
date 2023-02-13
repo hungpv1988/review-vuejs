@@ -4,61 +4,38 @@
         <router-view></router-view> 
     <!-- v-bind:style="{ backgroundImage: 'url(' + imagebg + ')' }"> -->
         <div class="container-fluid" id="main-container" >   
-            <!-- <div class="container">
-                <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-4">    
-                        <a href="/">
-                            <div id="logo"> </div>
-                        </a>
+            <Menu />
+        
+            <div class="row">
+                <div id="bib-search" class="container-fluid">
+                    <div class="row" style="display: block; height: 100px; "/>
+                        
+                    <div class="row" style="margin-bottom: 25px;">
+                        <span class="sologan" style="line-height: 60px; color: #FFF; font-weight: bold; color: #FFF; text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333;">YOUR BEST MOMENTS</span> 
                     </div>
-                    <div class="col-lg-9 col-md-9 col-sm-8 " id="main-menu">  
-                        <ul class="nav" style="float:right; margin-right:0px">
-                            <li class="nav-item">
-                                <a class="nav-link">  Tìm Ảnh </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link"> Giải Đấu </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link"> Giới Thiệu </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div> -->
-
-            <div id="bib-search">
-                <div class="container">
-                    <div class="search-text">
-                         YOUR <br> BEST MOMENTS
-                    </div>
-                </div>
-
-                <div class="search-form">
-                    <div class="container"> 
+                    
+                    <div class="row search-form">    
+                        <!-- consider to move to col-md-9, replace sm by md so that button will never lack space -->
+                        <!-- consider to display each component in one row if width is not small for clarity -->
+                        <div class="col-sm-8">
                             <div class="row">
-                                <!-- consider to move to col-md-9, replace sm by md so that button will never lack space -->
-                                <div class="col-sm-9">
-                                    <div class="row">
-                                        <div class="col-sm-6">
-                                            <select class="form-control" v-model="raceid" id="raceList">
-                                                <option v-for="option in options" :value="option.value" v-bind:key="option.value" >
-                                                    {{option.text}}
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <input v-model="bib" id="bib"  type="text" class="form-control" name="bib" placeholder="Nhập số BIB" />
-                                        </div>
-                                    </div>
+                                <div class="col-sm-6">
+                                    <select class="form-control" v-model="raceid" id="raceList">
+                                        <option v-for="option in options" :value="option.value" v-bind:key="option.value" >
+                                            {{option.text}}
+                                        </option>
+                                    </select>
                                 </div>
-
-                                <div class="col-sm-3">
-                                    <button id="btnMove" @click="moveToRaceDetails" class="form-control" style="background-color: #17b835; color: #FFF">TÌM ẢNH </button>
-                                    <a href=""> go </a>
+                                <div class="col-sm-6">
+                                    <input v-model="bib" id="bib"  type="text" class="form-control" name="bib" placeholder="Nhập số BIB" />
                                 </div>
                             </div>
-                    
+                        </div>
+
+                        <div class="col-sm-4">
+                            <button id="btnMove" @click="moveToRaceDetails" class="form-control" style="background-color: #17b835; color: #FFF">TÌM ẢNH </button>
+                            <a href=""> </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -67,38 +44,29 @@
 </template>
 
 <style scoped>
-#main-container { 
-  background: url("/src/assets/DSC_3582h.jpg") no-repeat center center fixed; 
+#bib-search  { 
+  background: url("/src/assets/anhnenmoi.jpg") no-repeat center center fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
+  margin-top: 5px;
+  position: relative;
+  height: 1200px;
 }
 
-
-#bib-search {
+/* #bib-search {
     position: relative;
-    /* background-image: url("../assets/backgroundrepeat.jpg");
-    background-repeat: repeat; */
+     background-image: url("../assets/backgroundrepeat.jpg");
+    background-repeat: repeat; 
     background-size: 100%;
     height: 1200px;
-}
-
-#bib-search .search-text {
-    padding-top: 10px;
-    font-size: 55px;
-    line-height: 60px;
-    font-weight: bold;
-    color: #FFF;
-    text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333;
-}
-
-#bib-search .search-form {
-    position: absolute;
-    top: 240px;
+} */
+.search-form {
     width: 100%;
     background-color: rgba(200,20,40,.4);
-    padding: 40px 0;
+    padding: 40px 0; 
+    margin-left: 4px;
 }
 
 .search-form .form-control, .search-form button {
@@ -108,11 +76,61 @@
     margin-bottom: 5px;
     margin-right: 10px;
 }
+
+@media (min-width: 0px) {
+    .sologan{
+        padding-left: 60px; 
+        font-size: 15px;
+    }
+}
+
+@media (min-width: 350px) {
+    .sologan{
+        padding-left: 85px; 
+        font-size: 15px;
+    }
+}
+
+@media (min-width: 576px) { 
+    .sologan{
+        padding-left: 110px; 
+        font-size: 24px;
+    }
+}
+
+@media (min-width: 768px) {  
+    .sologan{
+        padding-left: 150px;
+        font-size: 30px;
+    }
+}
+
+@media (min-width: 992px) { 
+    .sologan{
+        padding-left: 225px;
+        font-size: 50px;
+    }
+ }
+
+ @media (min-width: 1200px) { 
+    .sologan{
+        padding-left: 225px;
+        font-size: 60px;
+    }
+ }
+
+ @media (min-width: 1400px) { 
+    .sologan{
+        padding-left: 225px; 
+        font-size: 60px;
+    }
+ }
 </style>
 <script setup>
 import {ref, onMounted} from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import {getCampaigns, getGlobalConfig} from '../services/DataService'
+import Menu from "./Menu.vue";
 
 
 const {campaignsUrl} = getGlobalConfig();

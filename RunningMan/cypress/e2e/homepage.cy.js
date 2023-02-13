@@ -19,10 +19,10 @@ describe('homepage', () => {
     }));
     cy.get('#bib').invoke('attr', 'placeholder').should('eq', 'Nhập số BIB');
     cy.get('meta').then(($metaElements) =>{ 
-        assert.equal(isMetaElementExistedAndValid('og:url', 'https://yourbib.xyz'), true);
+        assert.equal(isMetaElementExistedAndValid('og:url', 'https://timanh.com'), true);
         assert.equal(isMetaElementExistedAndValid('og:type', 'article'), true);
         assert.equal(isMetaElementExistedAndValid('og:title', 'Những khoảnh khắc'), true);
-        assert.equal(isMetaElementExistedAndValid('og:image', 'https://yourbib.xyz/assets/DSC_3582h.397183d7.jpg'), true);
+        assert.equal(isMetaElementExistedAndValid('og:image', 'https://timanh.com/assets/anhnenmoi.jpg'), true);
         assert.equal(isMetaElementExistedAndValid('og:description', 'Tìm lại những khoảnh khắc rực rỡ nhất'), true);
         
         function isMetaElementExistedAndValid(ogProperty, contentValue){
