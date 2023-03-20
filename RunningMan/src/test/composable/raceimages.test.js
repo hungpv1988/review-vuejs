@@ -35,7 +35,8 @@ describe("races.vue", () => {
   });
 
   // should render as expected when visit with bib, but can move to end-to-end
-  it("should render as expected when visit raceimage without bib", async () => {
+  it("should render searching types as expected", async () => {
+    const raceIdSupportingSearchByImage = getAllCampaigns()[1].campaignId
     const wrapper = mount(HomePage, {
       global: {
         plugins: [router]
