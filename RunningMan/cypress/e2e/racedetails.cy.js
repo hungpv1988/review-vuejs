@@ -61,21 +61,25 @@ describe('racedetails with beforeeach to setup common data', () => {
           
       // });
     }, spy);
-    
-    cy.get('.page-item > a').eq(2).trigger('click');
+    cy.intercept(`${searchImagesUrl}*`).as('searchImages');
+    cy.get('.page-item > a').eq(pageNumber).trigger('click');
+    cy.wait('@searchImages');
     cy.get('.page-item.active').find('a').invoke('text').should('eq', pageNumber.toString());
     cy.get('#image-box').find('img').should('have.length', numberOfItemsPerPage); 
-    cy.wait(500); // wait for response to be returned, otherwise, new request is made even if data from previous request has not retuend data, and causing inconsistency in state.items in AlbumInfo
+    //cy.wait(500); // wait for response to be returned, otherwise, new request is made even if data from previous request has not retuend data, and causing inconsistency in state.items in AlbumInfo
     
     // visit page 03
     var newpageNumber = 3;
+    cy.intercept(`${searchImagesUrl}*`).as('searchImages');
     cy.get('.page-item > a').eq(newpageNumber).trigger('click');
+    cy.wait('@searchImages');
     cy.get('.page-item.active').find('a').invoke('text').should('eq', newpageNumber.toString());
-    cy.wait(500); // wait for response to be returned
+    //cy.wait(500); // wait for response to be returned
     
     cy.get('.page-item > a').eq(pageNumber).trigger('click');
     cy.get('.page-item.active').find('a').invoke('text').should('eq', pageNumber.toString());
     cy.get('#image-box').find('img').should('have.length', numberOfItemsPerPage); 
+    
     //https://stackoverflow.com/questions/67643208/verify-number-of-times-request-was-made
     cy.wait(1000).then(() => {               // arbitrary wait since we don't know exactly
       expect(requestCounter).to.eq(1)       // navigate but cache data, no make more request
@@ -236,5 +240,28 @@ describe('racedetails without beforeeach', function(){
     cy.get('#btnSearch').click(); 
     cy.get('#statistic-box').should('contain', 22104)
     cy.get('#image-box').find('img').should('have.length', 40); 
+  });
+
+  it('should search bib after visiting a page', () => {
+    // revisit page, and choose happy ekiden
+    const happyEkidenId = 32;
+    cy.intercept(`${searchImagesUrl}*`).as('searchImages');
+    cy.intercept(getCampsUrl).as('findCamps');
+    cy.visit(baseUrl);
+    
+    cy.wait('@findCamps');
+    cy.get('#raceList').select(happyEkidenId.toString());
+    cy.get('#btnMove').click();
+    cy.wait('@searchImages');
+
+    const bibSearchingType = '2'; // sync with code in RaceDetails.vue, searchType field
+    const bib = '1252-1'; //with happy ekiden, we have bib 1234. Hard to know a bib exists in a race as our data is not full
+    cy.get('.page-item > a').eq(2).trigger('click');
+    cy.intercept(`${searchImagesUrl}*`).as('loadPage');
+    cy.wait('@loadPage');
+    cy.get('#search-type').select(bibSearchingType); 
+    cy.get('#txtBib').type(bib); 
+    cy.get('#btnSearch').click(); 
+    cy.get('#image-box').find('img').should('have.length', 39); 
   });
 })

@@ -53,7 +53,7 @@ async function searchByImage(raceId, pageNumber, pageSize, file, previousFaceIds
   formData.append("page", pageNumber);
   formData.append("size", pageSize);
   formData.append("image", file);
-  formData.append("faceMatchThreshold", 90);
+  formData.append("faceMatchThreshold", 80);
   formData.append("maxFaces", 50);
   if (previousFaceIds){
     formData.append("previousFaceIds", previousFaceIds);
