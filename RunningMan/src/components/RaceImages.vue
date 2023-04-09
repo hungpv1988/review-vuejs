@@ -131,7 +131,7 @@ async function submitSearchCriteria(searchType, searchValue, file){
   searchingInfo.searchValue = searchValue;
   searchingInfo.searchType = searchType;
   searchingInfo.asset = file; // if search type is changed, file is set null in SearchBox, so searchingInfo needed to be updated accrodingly
-  
+  searchingInfo.pageNumber = globalConfig.startingPage; // reset page number as user click on a new search criteria
   // this is to re-render albumbox
   reloadCount.value++;
  
