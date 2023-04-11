@@ -92,7 +92,7 @@ const searchingInfo = initSearchingInfo();
 function initSearchingInfo(){
   // currently, only works with bib in home page
   const bibValue = route.query.bib ?? "*"; 
-  const searchType = (bibValue === "*") ? 1 : 2 ; //1 = search all, 2 = search bib  
+  const searchType = (bibValue === "*") ? 1 : 2 ; //1 = search all, 2 = search bib. We have three types of searching, but on homepage, no searching by image  
   
   return {
     searchValue: bibValue, 
@@ -127,14 +127,23 @@ onMounted(async() => {
 })
 
 // searchType, searchValue are passed from SearchBox.vue by emit event
-async function submitSearchCriteria(searchType, searchValue, file){ 
+async function submitSearchCriteria(searchType, searchValue, file){   
+  // reset searchingInfo
   searchingInfo.searchValue = searchValue;
   searchingInfo.searchType = searchType;
   searchingInfo.asset = file; // if search type is changed, file is set null in SearchBox, so searchingInfo needed to be updated accrodingly
-  searchingInfo.pageNumber = globalConfig.startingPage; // reset page number as user click on a new search criteria
+  searchingInfo.pageNumber = globalConfig.startingPage; // reset page number as user click on a new search criteria  
+  // we may not need those 3 lines, but keep it here for certainty
+  // we need to reset albuminfo, otherwise, after reloadCount.value++, the component is reloaded
+  // and its data would be binded with albumInfo.imageList that still have old value. Then, after feching data from search, new data is combined with old one
+  // and this leads to a wrong in many cases. Currently, it still shows data correctly as in AlbumBox's watch, imageList is not changed after the component is reloaded (state is fresh now) , so migratedata does not execute
+  albumInfo.imageList = [];
+  albumInfo.pageCount = 0;
+  albumInfo.totalImagesFound  = 0;
   // this is to re-render albumbox
   reloadCount.value++;
- 
+
+  // do a load if takes time here in the near future
   await searchData(searchingInfo)
       .then(response => {
           albumInfo.imageList = response.data.images;
@@ -146,7 +155,9 @@ async function submitSearchCriteria(searchType, searchValue, file){
           }
       })
    .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
-
+      albumInfo.imageList = [];
+      albumInfo.pageCount = 0;
+      albumInfo.totalImagesFound  = 0;
    })
   .finally(() => {
       if (searchingInfo.searchType == 3){// search by image
@@ -154,8 +165,7 @@ async function submitSearchCriteria(searchType, searchValue, file){
       }
 
       let query = {};
-      // need to check searchType == 2 (search by bib), but do later on after integrating with Hai
-      if (searchingInfo.searchValue != '*'){
+      if (searchingInfo.searchType == 2){ // search by bib, then, update bib in Url
         query.bib = searchValue; 
       };
       
