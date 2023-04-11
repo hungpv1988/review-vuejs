@@ -132,8 +132,7 @@ async function submitSearchCriteria(searchType, searchValue, file){
   searchingInfo.searchValue = searchValue;
   searchingInfo.searchType = searchType;
   searchingInfo.asset = file; // if search type is changed, file is set null in SearchBox, so searchingInfo needed to be updated accrodingly
-  searchingInfo.pageNumber = globalConfig.startingPage; // reset page number as user click on a new search criteria
-  
+  searchingInfo.pageNumber = globalConfig.startingPage; // reset page number as user click on a new search criteria  
   // we may not need those 3 lines, but keep it here for certainty
   // we need to reset albuminfo, otherwise, after reloadCount.value++, the component is reloaded
   // and its data would be binded with albumInfo.imageList that still have old value. Then, after feching data from search, new data is combined with old one
