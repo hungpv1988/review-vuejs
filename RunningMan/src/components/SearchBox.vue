@@ -1,7 +1,7 @@
 <template>
-    <div class="container-fluid">
+    <div class="container-fluid" id="#search-box">
       <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-7">
             <div class="row">
                 <div class="col-md-5" style="margin-bottom: 5px;">
                     <select class="form-control" id="search-type" v-model="searchType" @change="onSearchTypeChange">
@@ -23,12 +23,19 @@
           <div class="col-md-2">
               <button class="form-control" id="btnSearch" @click="$emit('searchImages', searchType, searchValue, file)">Tìm ảnh</button>
           </div>
+          <div class="col-md-2">
+            <!-- <a class="btn btn-info form-control" @click="generateZIP"  >Download image</a> -->
+            <a class="btn btn-info form-control" @click=" $emit('downloadImages')">Download image</a>
+          </div>
        </div>
     </div>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue';
+import * as JSZip from 'jszip';
+import * as JSZipUtils from 'jszip-utils';
+import { saveAs } from 'file-saver';
 const props = defineProps(['searchType', 'searchValue', 'allowType']);
 const searchType = ref(props.searchType); // default value of int should be zero, would be setup in the next following lines
 const searchValue = ref(props.searchValue); // don't set as null. Value cannot be updated. If primitive type: string, int, let's set a default value.
@@ -69,4 +76,61 @@ watch(
     } 
   }
  )  ;
+
+ // download image
+ // Using fetch
+async function downloadtest(imageSrc) {
+    const image = await fetch('https://yourbib-space.sgp1.digitaloceanspaces.com/nulllg230408vetjhwatermark-D75_5627.JPG', {
+      header:{
+      'X-Requested-With': 'XMLHttpRequest',
+      'Access-Control-Allow-Origin' : '*',
+      'Access-Control-Allow-Methods':'GET'
+    }
+  });
+    // .then( (response)=>{
+    //     console.log(response);
+    // })
+    // .catch((error) => {
+    //     console.log(error);
+    //     return;
+    // });
+    const imageBlog = await image.blob()
+    const imageURL = URL.createObjectURL(imageBlog)
+
+    const link = document.createElement('a')
+    link.href = imageURL
+    link.download = 'image file name here'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+}
+async function downloadAllImageByBib(){
+  
+}
+function generateZIP() {
+  //https://yourbib-space.sgp1.digitaloceanspaces.com/nulllg230408aostzwatermark-D75_5607.JPG
+  const links = ["https://localhost:44371/images/maunuxinh.jpg", "https://localhost:44371/images/maunuxinh.jpg","https://localhost:44371/images/maunuxinh.jpg"]
+  const zip = new JSZip();
+  // const zip = JSZip().default.getBinaryContent
+  var count = 0;
+  var zipFilename = "Pictures.zip";
+
+  links.forEach(function (url, i) {
+    console.log("ok");
+    var filename = links[i];
+    filename = i+ ".jpg" ;
+    // loading a file and add it in a zip file
+    JSZipUtils.getBinaryContent(url, function (err, data) {
+      if (err) {
+        throw err; // or handle the error
+      }
+      zip.file(filename, data, { binary: true });
+      count++;
+      if (count == links.length) {
+        zip.generateAsync({ type: 'blob' }).then(function (content) {
+          saveAs(content, zipFilename);
+        });
+      }
+    });
+  })}
 </script>

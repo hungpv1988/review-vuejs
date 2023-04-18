@@ -19,14 +19,14 @@
         <hr>
         <hr>
       </div>
-
-      <div class="row" id="#search-box">
-        <SearchBox  v-bind="searchingInfo" @search-images="submitSearchCriteria" :allowType="allowType" />
-      </div>
-      <div class="row" id="#album-box">
-        <AlbumBox :key="reloadCount" v-bind="albumInfo"  @loadPage="(pageNumber) => loadPageData(pageNumber)"  />
-      </div>
     </div>
+
+    
+    <!-- SearchBox is a container-fluid  -->
+    <SearchBox  v-bind="searchingInfo" @search-images="submitSearchCriteria" :allowType="allowType" @download-images="downloadUserImages" />
+    
+    <!-- SearchBox is a container-fluid  -->
+    <AlbumBox :key="reloadCount" v-bind="albumInfo"  @loadPage="(pageNumber) => loadPageData(pageNumber)" />
   </div>
 </template>
 
@@ -70,6 +70,8 @@ import {searchData, getGlobalConfig} from '../services/DataService'
 import SearchBox from "./SearchBox.vue";
 import AlbumBox from "./AlbumBox.vue";
 import Menu from "./Menu.vue";
+import * as JSZip from 'jszip';
+import * as JSZipUtils from 'jszip-utils';
 
 const reloadCount = ref(0); // to make searchbox re-render when needed. This is used as a key for searchbox so when its value is changed, the component is re-rendered
 const route = useRoute();
@@ -126,6 +128,7 @@ onMounted(async() => {
           });
 })
 
+// consider to moved the main business to SearchBox later on, at here, just update albuminfo 
 // searchType, searchValue are passed from SearchBox.vue by emit event
 async function submitSearchCriteria(searchType, searchValue, file){   
   // reset searchingInfo
@@ -194,4 +197,53 @@ async function loadPageData(pageNumber){
            // console.log('final');
           })
 };
+
+// can be moved to SearchBox later on
+ async function downloadUserImages(){
+  const pageNumber = searchingInfo.pageNumber; // keep original value
+  const pageSize = searchingInfo.pageSize; // keep original value
+  const pageSizeForDownload = 1000; // no use has 1k image, this is to guarantee that all images of an user can be returned.
+  searchingInfo.pageSize =  pageSizeForDownload;
+  searchingInfo.pageNumber = globalConfig.startingPage;
+
+  await searchData(searchingInfo).then(response => {
+      const images = response.data.images;
+      generateZIP(images);
+  })
+  
+  searchingInfo.pageSize =  pageSize;
+  searchingInfo.pageNumber = pageNumber;
+ }
+
+
+ function generateZIP(imageList) {
+  var zip = null;
+  try{
+    zip = new JSZip();
+  }
+  catch{
+    zip = JSZip.default();
+  }
+  
+  var count = 0;
+  var zipFilename = "timanh.zip";
+  const numberofImages = imageList.length; 
+  imageList.forEach(function (imageItem, i) {
+    var url = imageItem.imageWithLogoUrl;
+   // var extension = url.split(".").last(); // add extension to replace .jpg
+    var filename =  'timanh'+i+'.jpg' ;
+    // loading a file and add it in a zip file
+    JSZipUtils.getBinaryContent(url, function (err, data) {
+      if (err) {
+        throw err; // or handle the error
+      }
+      zip.file(filename, data, { binary: true });
+      count++;
+      if (count == numberofImages) {
+        zip.generateAsync({ type: 'blob' }).then(function (content) {
+          saveAs(content, zipFilename);
+        });
+      }
+    });
+  })}
 </script>
