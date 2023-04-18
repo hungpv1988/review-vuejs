@@ -19,14 +19,23 @@
         <hr>
         <hr>
       </div>
-
-      <div class="row" id="#search-box">
-        <SearchBox  v-bind="searchingInfo" @search-images="submitSearchCriteria" :allowType="allowType" />
-      </div>
-      <div class="row" id="#album-box">
-        <AlbumBox :key="reloadCount" v-bind="albumInfo"  @loadPage="(pageNumber) => loadPageData(pageNumber)"  />
-      </div>
     </div>
+
+    <Modal v-if="showModal" @close="showModal = false">
+      <template #header>
+        <h5 class="modal-title" style="font-size: 16px;" id="exampleModalLabel">Quá trình tải đang bắt đầu</h5>
+      </template>
+
+      <template #body>
+        <ve-progress style="margin-left: 8px;" :progress="downloadProgress" slot="body"/> 
+      </template>
+    </Modal>
+
+    <!-- SearchBox is a container-fluid  -->
+    <SearchBox :enableDownload="enableDownload"  v-bind="searchingInfo" @search-images="submitSearchCriteria" :allowType="allowType" @download-images="downloadUserImages" />
+    
+    <!-- SearchBox is a container-fluid  -->
+    <AlbumBox :key="reloadCount" :uploadedImage="uploadedImage" v-bind="albumInfo"  @loadPage="(pageNumber) => loadPageData(pageNumber)" />
   </div>
 </template>
 
@@ -70,6 +79,10 @@ import {searchData, getGlobalConfig} from '../services/DataService'
 import SearchBox from "./SearchBox.vue";
 import AlbumBox from "./AlbumBox.vue";
 import Menu from "./Menu.vue";
+import * as JSZip from 'jszip';
+import * as JSZipUtils from 'jszip-utils';
+import { saveAs } from 'file-saver';
+import Modal from "./Modal.vue";
 
 const reloadCount = ref(0); // to make searchbox re-render when needed. This is used as a key for searchbox so when its value is changed, the component is re-rendered
 const route = useRoute();
@@ -79,9 +92,18 @@ const raceid = route.params.raceid;
 const allowType = ref(1);
 const raceName = ref(""); 
 const configedHosts = ["timanh.com", "localhost", "127.0.0.1"];
+const uploadedImage = ref(""); // the url of image uploaded for searching purpose
+
+// move this to SearchBox later on
+// by default, false. But if bib exists on query (f5 or search at home page), then show
+const enableDownload = ref( (!route.query.bib) ? false : true );
+const downloadProgress = ref(0);
+const showModal = ref(false);
+
+// either in configed host or not in Iframe, hide our info including menu and logo
 const isOurHost = configedHosts.filter((item) => { 
   return window.location.href.indexOf(item) > 0;
-}).length > 0 ;
+}).length > 0 && (window.location === window.parent.location); 
 
 // initial data from configuration
 // startingPage is the first page, value normally is 1
@@ -101,7 +123,8 @@ function initSearchingInfo(){
     raceid: raceid,
     pageSize: globalConfig.pageSize,
     pageNumber: globalConfig.startingPage,
-    previousFaceIds: null
+    previousFaceIds: null,
+    faceMatchThreshold: 80 // default value is 80
   }
 };
 
@@ -111,6 +134,10 @@ onMounted(async() => {
   await searchData(searchingInfo)
          .then(response => {
               raceName.value = response.data.campaignName;
+              if (response.data.faceMatchThreshold){ // later on, should remove this line.
+                searchingInfo.faceMatchThreshold = response.data.faceMatchThreshold;
+              }
+
               albumInfo.imageList = response.data.images;
               albumInfo.pageCount = Math.ceil(response.data.total / globalConfig.pageSize);
               albumInfo.totalImagesFound  = response.data.total;
@@ -126,13 +153,16 @@ onMounted(async() => {
           });
 })
 
+// consider to moved the main business to SearchBox later on, at here, just update albuminfo 
 // searchType, searchValue are passed from SearchBox.vue by emit event
 async function submitSearchCriteria(searchType, searchValue, file){   
-  // reset searchingInfo
+  // reset searchingInfo except for faceMatchThreshold
   searchingInfo.searchValue = searchValue;
+  searchingInfo.pageNumber = globalConfig.startingPage;
   searchingInfo.searchType = searchType;
   searchingInfo.asset = file; // if search type is changed, file is set null in SearchBox, so searchingInfo needed to be updated accrodingly
-  searchingInfo.pageNumber = globalConfig.startingPage; // reset page number as user click on a new search criteria  
+  searchingInfo.previousFaceIds = null; // click search button, meaning a new image is chosen, meaning should be clear
+
   // we may not need those 3 lines, but keep it here for certainty
   // we need to reset albuminfo, otherwise, after reloadCount.value++, the component is reloaded
   // and its data would be binded with albumInfo.imageList that still have old value. Then, after feching data from search, new data is combined with old one
@@ -152,6 +182,18 @@ async function submitSearchCriteria(searchType, searchValue, file){
           if (searchingInfo.searchType == 3){
             // test to see whether value can be changed in const searchingInfo
              searchingInfo.previousFaceIds = response.data.previousFaceIds; // search by image need this
+             uploadedImage.value = URL.createObjectURL(file);
+          }
+          else{
+            uploadedImage.value = "";
+          }
+
+          // look stupid, should move to SearchBox
+          if (searchingInfo.searchType == 2 || searchingInfo.searchType == 3){
+            enableDownload.value = true;
+          }
+          else {
+            enableDownload.value = false;
           }
       })
    .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
@@ -194,4 +236,83 @@ async function loadPageData(pageNumber){
            // console.log('final');
           })
 };
+
+// can be moved to SearchBox later on
+ async function downloadUserImages(){
+  const pageNumber = searchingInfo.pageNumber; // keep original value
+  const pageSize = searchingInfo.pageSize; // keep original value
+  // no need to reset previousFaceIds and faceMatchThreshold
+
+  const pageSizeForDownload = 1000; // no use has 1k image, this is to guarantee that all images of an user can be returned.
+  searchingInfo.pageSize =  pageSizeForDownload;
+  searchingInfo.pageNumber = globalConfig.startingPage;
+  searchingInfo.previousFaceIds = null; // verify with Hai
+// file is still the one is uploaded before and stored in searchInfo in submitSearchCriteria function
+  
+  showModal.value = true;
+  await searchData(searchingInfo).then(response => {
+      const images = response.data.images;
+      generateZIP(images);
+  })
+  
+  searchingInfo.pageSize =  pageSize;
+  searchingInfo.pageNumber = pageNumber;
+  searchingInfo.previousFaceIds = previousFaceIds;
+ }
+
+function generateZIP(imageList) {
+  var zip = null;
+
+  // have not been able to fix this problem.
+  // seem to wrong at only node js, will come back when doing embeded in dot net
+  try{
+    zip = new JSZip();
+  }
+  catch{
+    zip = JSZip.default();
+  }
+  
+  var zipFilename = "timanh.zip";
+  const numberofImages = imageList.length; 
+  
+  imageList.forEach(function (imageItem, index) {
+    var url = imageItem.imageWithLogoUrl;
+    
+    var extension = url.split(".").pop(); // split by . and get the last item. e.g 'https://yourbib.com/nulllg230408blvmowatermark-D75_6421.JPG';
+    var filename =  'timanh_'.concat(index+1).concat('.').concat(extension); //i starts from 0, so need to add i+1 to be familiar with users
+  
+    // loading a file and add it in a zip file
+    JSZipUtils.getBinaryContent(url, function (err, data) {
+      if (err) {
+        // may re-download here if needed. But keep it for later on
+        console.log(err);
+        return;
+      }
+      //console.log("download successfully ".concat(url));
+      try{
+        zip.file(filename, data, { binary: true });
+        console.log("zip successfully ".concat(url));
+      }
+      catch{
+        console.log("zip fail at ".concat(index).concat(url));
+      }
+      
+      
+      if (downloadProgress.value <= 92){ // hack to guarantee that value is always <=100%
+        downloadProgress.value = downloadProgress.value + Math.ceil(100 / numberofImages);
+      } 
+      
+      if (index == numberofImages - 1) { // index start from 0
+        zip.generateAsync({ type: 'blob' }).then(function (content) {
+          saveAs(content, zipFilename);
+          setTimeout(function () {
+            showModal.value = false;
+            downloadProgress.value = 0;
+        }, 1000);
+     
+        });
+      }
+    });
+  })
+  }
 </script>

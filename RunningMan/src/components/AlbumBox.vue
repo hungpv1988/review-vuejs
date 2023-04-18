@@ -1,5 +1,13 @@
 <template>
     <div id="main-box" class="container-fluid">   <!-- should change the name main-box -->
+        <div class="row" style="margin-top: 20px;" v-if="(props.uploadedImage)" id="image-uploaded">
+            <div class="col-sm-9 col-md-6 col-lg-4">
+                <div>Ảnh bạn đẩy lên. Hãy chọn ảnh rõ khuôn mặt bạn để tăng độ chính xác tìm kiếm</div>
+                <a data-fancybox="imggroup" v-bind:href="props.uploadedImage" :data-download-src="props.uploadedImage"> 
+                    <img v-bind:src="props.uploadedImage" class="img-fluid img-thumbnail">
+                </a>
+            </div>
+        </div>
         <div class="row" style="margin-top: 20px;"> 
                 <div class="col-md-9" style="margin-bottom: 1rem" id="statistic-box"> Có <strong>{{props.totalImagesFound}}</strong> ảnh được tìm thấy</div>
     
@@ -15,7 +23,9 @@
                         </paginate>
                 </div> 
         </div>
-  
+        <div class="row">
+
+        </div>
         <div class="row" style="align-items:center;" id="image-box">
             <TransitionGroup name="list">
                 <div class="col-sm-6 col-md-3 col-lg-2" v-for="item in itemsToBeDisplayed" :key="item.id">
@@ -38,7 +48,7 @@ const emit = defineEmits(['loadPage'])
 const {startingPage, pageSize} = getGlobalConfig();
 
 // imageList is retrieved on parent's component: RaceImages.vue, and props is updated, then, child component - ImageBox is updated accoridngly
-const props = defineProps(['imageList', 'pageCount', 'totalImagesFound']);
+const props = defineProps(['imageList', 'pageCount', 'totalImagesFound', 'uploadedImage']);
 const state = reactive({items: []});
 const itemsToBeDisplayed = ref([]);
 

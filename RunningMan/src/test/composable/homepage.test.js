@@ -69,6 +69,8 @@ describe("HomePage.vue", () => {
   //assert
     expect(wrapper.html()).toContain('Tất cả ảnh'); // router navigates to raceimage
     expect(wrapper.findComponent(RaceImages).exists()).toBe(true);
+    var btnDownload = await wrapper.find("#btnDownload");
+    expect(btnDownload.exists()).toBe(false); // no bib passed, so the button should not be rendered
   });
 
   it("should navigate to raceimages in line with chosen options in dropdownlist after clicking on the button", async () => {
@@ -146,6 +148,8 @@ describe("HomePage.vue", () => {
     expect(currentRoute.params.raceid).equal(raceId);
     expect(currentRoute.query.bib).equal(txtBib.element.value);
     expect(currentRoute.name).equal("racedetails");
+    var btnDownload = await wrapper.find("#btnDownload");
+    expect(btnDownload.exists()).toBe(true); //  bib passed, so the button should  be rendered
   });
 });
 

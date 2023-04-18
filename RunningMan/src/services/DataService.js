@@ -23,7 +23,7 @@ export async function searchData(searchCriteria){//(campId, bib, pageNumber = 1,
       return searchByBIP(raceId, searchCriteria.searchValue, searchCriteria.pageNumber, searchCriteria.pageSize);
    }
    else {
-      return searchByImage(raceId, searchCriteria.pageNumber, searchCriteria.pageSize, searchCriteria.asset, searchCriteria.previousFaceIds);
+      return searchByImage(raceId, searchCriteria.pageNumber, searchCriteria.pageSize, searchCriteria.asset, searchCriteria.previousFaceIds, searchCriteria.faceMatchThreshold);
    }
 }
 
@@ -45,7 +45,7 @@ async function searchByBIP(raceId, bib, pageNumber, pageSize){
 }
 
 // try to post to the endpoint to create a race to test
-async function searchByImage(raceId, pageNumber, pageSize, file, previousFaceIds){
+async function searchByImage(raceId, pageNumber, pageSize, file, previousFaceIds, faceMatchThreshold){
   const url = globalConfig.searchImageUrl;
 
   let formData = new FormData();
@@ -53,7 +53,7 @@ async function searchByImage(raceId, pageNumber, pageSize, file, previousFaceIds
   formData.append("page", pageNumber);
   formData.append("size", pageSize);
   formData.append("image", file);
-  formData.append("faceMatchThreshold", 80);
+  formData.append("faceMatchThreshold", faceMatchThreshold);
   formData.append("maxFaces", 50);
   if (previousFaceIds){
     formData.append("previousFaceIds", previousFaceIds);
