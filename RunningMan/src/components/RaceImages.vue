@@ -23,10 +23,10 @@
 
     
     <!-- SearchBox is a container-fluid  -->
-    <SearchBox  v-bind="searchingInfo" @search-images="submitSearchCriteria" :allowType="allowType" @download-images="downloadUserImages" />
+    <SearchBox :enableDownload="enableDownload"  v-bind="searchingInfo" @search-images="submitSearchCriteria" :allowType="allowType" @download-images="downloadUserImages" />
     
     <!-- SearchBox is a container-fluid  -->
-    <AlbumBox :key="reloadCount" v-bind="albumInfo"  @loadPage="(pageNumber) => loadPageData(pageNumber)" />
+    <AlbumBox :key="reloadCount" :uploadedImage="uploadedImage" v-bind="albumInfo"  @loadPage="(pageNumber) => loadPageData(pageNumber)" />
   </div>
 </template>
 
@@ -72,6 +72,7 @@ import AlbumBox from "./AlbumBox.vue";
 import Menu from "./Menu.vue";
 import * as JSZip from 'jszip';
 import * as JSZipUtils from 'jszip-utils';
+import { saveAs } from 'file-saver';
 
 const reloadCount = ref(0); // to make searchbox re-render when needed. This is used as a key for searchbox so when its value is changed, the component is re-rendered
 const route = useRoute();
@@ -81,9 +82,16 @@ const raceid = route.params.raceid;
 const allowType = ref(1);
 const raceName = ref(""); 
 const configedHosts = ["timanh.com", "localhost", "127.0.0.1"];
+const uploadedImage = ref(""); // the url of image uploaded for searching purpose
+
+// move this to SearchBox later on
+// by default, false. But if bib exists on query (f5 or search at home page), then show
+const enableDownload = ref( (!route.query.bib) ? false : true );
+
+// either in configed host or not in Iframe, hide our info including menu and logo
 const isOurHost = configedHosts.filter((item) => { 
   return window.location.href.indexOf(item) > 0;
-}).length > 0 ;
+}).length > 0 && (window.location === window.parent.location); 
 
 // initial data from configuration
 // startingPage is the first page, value normally is 1
@@ -155,6 +163,18 @@ async function submitSearchCriteria(searchType, searchValue, file){
           if (searchingInfo.searchType == 3){
             // test to see whether value can be changed in const searchingInfo
              searchingInfo.previousFaceIds = response.data.previousFaceIds; // search by image need this
+             uploadedImage.value = URL.createObjectURL(file);
+          }
+          else{
+            uploadedImage.value = "";
+          }
+
+          // look stupid, should move to SearchBox
+          if (searchingInfo.searchType == 2 || searchingInfo.searchType == 3){
+            enableDownload.value = true;
+          }
+          else {
+            enableDownload.value = false;
           }
       })
    .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
@@ -215,9 +235,10 @@ async function loadPageData(pageNumber){
   searchingInfo.pageNumber = pageNumber;
  }
 
-
  function generateZIP(imageList) {
   var zip = null;
+
+  // have not been able to fix this problem.
   try{
     zip = new JSZip();
   }
@@ -230,8 +251,9 @@ async function loadPageData(pageNumber){
   const numberofImages = imageList.length; 
   imageList.forEach(function (imageItem, i) {
     var url = imageItem.imageWithLogoUrl;
-   // var extension = url.split(".").last(); // add extension to replace .jpg
-    var filename =  'timanh'+i+'.jpg' ;
+    // add extension to replace .jpg. Add preview box as well
+    var extension = url.split(".").pop(); // split by . and get the last item. e.g 'https://yourbib.com/nulllg230408blvmowatermark-D75_6421.JPG';
+    var filename =  'timanh_'.concat(i+1).concat('.').concat(extension); //i starts from 0, so need to add i+1 to be familiar with users
     // loading a file and add it in a zip file
     JSZipUtils.getBinaryContent(url, function (err, data) {
       if (err) {
