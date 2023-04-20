@@ -21,7 +21,16 @@
       </div>
     </div>
 
-    
+    <Modal v-if="showModal" @close="showModal = false">
+      <template #header>
+        <h5 class="modal-title" style="font-size: 16px;" id="exampleModalLabel">Quá trình tải đang bắt đầu</h5>
+      </template>
+
+      <template #body>
+        <ve-progress style="margin-left: 8px;" :progress="downloadProgress" slot="body"/> 
+      </template>
+    </Modal>
+
     <!-- SearchBox is a container-fluid  -->
     <SearchBox :enableDownload="enableDownload"  v-bind="searchingInfo" @search-images="submitSearchCriteria" :allowType="allowType" @download-images="downloadUserImages" />
     
@@ -73,6 +82,7 @@ import Menu from "./Menu.vue";
 import * as JSZip from 'jszip';
 import * as JSZipUtils from 'jszip-utils';
 import { saveAs } from 'file-saver';
+import Modal from "./Modal.vue";
 
 const reloadCount = ref(0); // to make searchbox re-render when needed. This is used as a key for searchbox so when its value is changed, the component is re-rendered
 const route = useRoute();
@@ -87,6 +97,8 @@ const uploadedImage = ref(""); // the url of image uploaded for searching purpos
 // move this to SearchBox later on
 // by default, false. But if bib exists on query (f5 or search at home page), then show
 const enableDownload = ref( (!route.query.bib) ? false : true );
+const downloadProgress = ref(0);
+const showModal = ref(false);
 
 // either in configed host or not in Iframe, hide our info including menu and logo
 const isOurHost = configedHosts.filter((item) => { 
@@ -225,7 +237,7 @@ async function loadPageData(pageNumber){
   const pageSizeForDownload = 1000; // no use has 1k image, this is to guarantee that all images of an user can be returned.
   searchingInfo.pageSize =  pageSizeForDownload;
   searchingInfo.pageNumber = globalConfig.startingPage;
-
+  showModal.value = true;
   await searchData(searchingInfo).then(response => {
       const images = response.data.images;
       generateZIP(images);
@@ -235,7 +247,7 @@ async function loadPageData(pageNumber){
   searchingInfo.pageNumber = pageNumber;
  }
 
- function generateZIP(imageList) {
+function generateZIP(imageList) {
   var zip = null;
 
   // have not been able to fix this problem.
@@ -249,11 +261,13 @@ async function loadPageData(pageNumber){
   var count = 0;
   var zipFilename = "timanh.zip";
   const numberofImages = imageList.length; 
+  
   imageList.forEach(function (imageItem, i) {
     var url = imageItem.imageWithLogoUrl;
-    // add extension to replace .jpg. Add preview box as well
+    
     var extension = url.split(".").pop(); // split by . and get the last item. e.g 'https://yourbib.com/nulllg230408blvmowatermark-D75_6421.JPG';
     var filename =  'timanh_'.concat(i+1).concat('.').concat(extension); //i starts from 0, so need to add i+1 to be familiar with users
+  
     // loading a file and add it in a zip file
     JSZipUtils.getBinaryContent(url, function (err, data) {
       if (err) {
@@ -261,11 +275,21 @@ async function loadPageData(pageNumber){
       }
       zip.file(filename, data, { binary: true });
       count++;
+      if (downloadProgress.value <= 92){ // hack to guarantee that value is always <=100%
+        downloadProgress.value = downloadProgress.value + Math.ceil(100 / numberofImages);
+      } 
+      
       if (count == numberofImages) {
         zip.generateAsync({ type: 'blob' }).then(function (content) {
           saveAs(content, zipFilename);
+          setTimeout(function () {
+            showModal.value = false;
+            downloadProgress.value = 0;
+        }, 1000);
+     
         });
       }
     });
-  })}
+  })
+  }
 </script>

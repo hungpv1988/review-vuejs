@@ -24,7 +24,6 @@
               <button class="form-control" id="btnSearch" @click="$emit('searchImages', searchType, searchValue, file)">Tìm ảnh</button>
           </div>
           <div class="col-md-2" v-if="props.enableDownload">
-            <!-- <a class="btn btn-info form-control" @click="generateZIP"  >Download image</a> -->
             <a class="btn btn-info form-control" @click=" $emit('downloadImages')">Tải ảnh về</a>
           </div>
        </div>
@@ -73,27 +72,4 @@ watch(
     } 
   }
  )  ;
-
- // download image
- // Using fetch
-async function downloadtest(imageSrc) {
-    const image = await fetch('https://yourbib-space.sgp1.digitaloceanspaces.com/nulllg230408vetjhwatermark-D75_5627.JPG', {
-      header:{
-      'X-Requested-With': 'XMLHttpRequest',
-      'Access-Control-Allow-Origin' : '*',
-      'Access-Control-Allow-Methods':'GET'
-    }
-  });
-    const imageBlog = await image.blob()
-    const imageURL = URL.createObjectURL(imageBlog)
-
-    const link = document.createElement('a')
-    link.href = imageURL
-    link.download = 'image file name here'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-}
-
-
 </script>
