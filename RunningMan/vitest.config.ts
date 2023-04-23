@@ -7,5 +7,8 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
   },
+  build: {
+    minify: false
+  },
    root: ".", //Define the root
 });

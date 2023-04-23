@@ -88,7 +88,7 @@ const reloadCount = ref(0); // to make searchbox re-render when needed. This is 
 const route = useRoute();
 const router = useRouter();
 //set up default value for searching box
-const raceid = route.params.raceid;
+const raceid = route.params.raceid ?? route.query.raceid;
 const allowType = ref(1);
 const raceName = ref(""); 
 const configedHosts = ["timanh.com", "localhost", "127.0.0.1"];
