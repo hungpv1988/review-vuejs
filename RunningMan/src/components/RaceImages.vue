@@ -88,7 +88,7 @@ const reloadCount = ref(0); // to make searchbox re-render when needed. This is 
 const route = useRoute();
 const router = useRouter();
 //set up default value for searching box
-const raceid = route.params.raceid ?? route.query.raceid;
+const raceid = route.params.raceid ?? route.query.raceid;  // see comment in main.js. If render on our site, it's on params, otherwise in query
 const allowType = ref(1);
 const raceName = ref(""); 
 const configedHosts = ["timanh.com", "localhost", "127.0.0.1"];
@@ -156,6 +156,7 @@ async function submitSearchCriteria(searchType, searchValue, file){
   searchingInfo.searchType = searchType;
   searchingInfo.asset = file; // if search type is changed, file is set null in SearchBox, so searchingInfo needed to be updated accrodingly
   searchingInfo.pageNumber = globalConfig.startingPage; // reset page number as user click on a new search criteria  
+  searchingInfo.previousFaceIds = null;
   // we may not need those 3 lines, but keep it here for certainty
   // we need to reset albuminfo, otherwise, after reloadCount.value++, the component is reloaded
   // and its data would be binded with albumInfo.imageList that still have old value. Then, after feching data from search, new data is combined with old one
@@ -200,6 +201,10 @@ async function submitSearchCriteria(searchType, searchValue, file){
       }
 
       let query = {};
+      if (route.query.raceid){
+        query.raceid = route.query.raceid;
+      }
+      
       if (searchingInfo.searchType == 2){ // search by bib, then, update bib in Url
         query.bib = searchValue; 
       };
@@ -234,10 +239,14 @@ async function loadPageData(pageNumber){
  async function downloadUserImages(){
   const pageNumber = searchingInfo.pageNumber; // keep original value
   const pageSize = searchingInfo.pageSize; // keep original value
+  //const previousFaceIds = searchingInfo.previousFaceIds; verify with Hải ok. Just need to pass previousFaceIDs, do not need to set it to null
   const pageSizeForDownload = 1000; // no use has 1k image, this is to guarantee that all images of an user can be returned.
   searchingInfo.pageSize =  pageSizeForDownload;
   searchingInfo.pageNumber = globalConfig.startingPage;
   showModal.value = true;
+  // PreviousFaceIds has been returned previously and stored in searchingInfo. 
+  // BE only needs to know previousFaceIds and use it for querying data.
+  
   await searchData(searchingInfo).then(response => {
       const images = response.data.images;
       generateZIP(images);
@@ -245,6 +254,7 @@ async function loadPageData(pageNumber){
   
   searchingInfo.pageSize =  pageSize;
   searchingInfo.pageNumber = pageNumber;
+  //searchingInfo.previousFaceIds = previousFaceIds;  // already verified with Hai, no need to set previousFaceIds null and reset
  }
 
 function generateZIP(imageList) {
