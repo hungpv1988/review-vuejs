@@ -125,6 +125,8 @@ describe("races.vue", () => {
     txtBib = await wrapper.find("#txtBib") ; 
     expect(txtBib.element.disabled).toBe(true);
     expect(txtBib.element.value).toBe("*");
+    var btnDownload = await wrapper.find("#btnDownload");
+    expect(btnDownload.exists()).toBe(false); //  Do not allow download if search all, should not be exist
 
     // test interaction when search by bib
     cbSearchType.setValue(cbSearchType.element.options[1].value); // search by bib
@@ -135,6 +137,21 @@ describe("races.vue", () => {
     await flushPromises();
     var currentRoute = router.currentRoute.value;
     expect(currentRoute.query.bib).equal(txtBib.element.value);
+    btnDownload = await wrapper.find("#btnDownload");
+    expect(btnDownload.exists()).toBe(true); //   allow download if search by bib, should not be exist
+    
+    // test interaction when search by image can be done in IT as it's easier to setup
+
+    // test interaction when search all image
+    var cbSearchType = await wrapper.find("#search-type") ;   
+    cbSearchType.setValue(cbSearchType.element.options[0].value); // search by bib
+    txtBib = await wrapper.find("#txtBib") ; 
+    expect(txtBib.element.disabled).toBe(true);
+    expect(txtBib.element.value).toBe("*");
+    await wrapper.find("#btnSearch").trigger('click');
+    await flushPromises();
+    var btnDownload = await wrapper.find("#btnDownload");
+    expect(btnDownload.exists()).toBe(false); //  Do not allow download if search all, should not be exist
   });
 });
 

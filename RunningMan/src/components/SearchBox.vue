@@ -1,7 +1,7 @@
 <template>
-    <div class="container-fluid">
-      <div class="row">
-          <div class="col-md-6">
+    <div class="container-fluid" id="#search-box">
+       <div class="row">
+          <div class="col-md-7">
             <div class="row">
                 <div class="col-md-5" style="margin-bottom: 5px;">
                     <select class="form-control" id="search-type" v-model="searchType" @change="onSearchTypeChange">
@@ -23,13 +23,16 @@
           <div class="col-md-2">
               <button class="form-control" id="btnSearch" @click="$emit('searchImages', searchType, searchValue, file)">Tìm ảnh</button>
           </div>
+          <div class="col-md-2" v-if="props.enableDownload">
+            <a class="btn btn-info form-control" id="btnDownload"  @click=" $emit('downloadImages')">Tải ảnh về</a>
+          </div>
        </div>
     </div>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue';
-const props = defineProps(['searchType', 'searchValue', 'allowType']);
+const props = defineProps(['searchType', 'searchValue', 'allowType', 'enableDownload']);
 const searchType = ref(props.searchType); // default value of int should be zero, would be setup in the next following lines
 const searchValue = ref(props.searchValue); // don't set as null. Value cannot be updated. If primitive type: string, int, let's set a default value.
 const file = ref(null);
