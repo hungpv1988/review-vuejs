@@ -88,7 +88,7 @@ const reloadCount = ref(0); // to make searchbox re-render when needed. This is 
 const route = useRoute();
 const router = useRouter();
 //set up default value for searching box
-const raceid = route.params.raceid;
+const raceid = route.params.raceid ?? route.query.raceid; // see comment in main.js. If render on our site, it's on params, otherwise in query
 const allowType = ref(1);
 const raceName = ref(""); 
 const configedHosts = ["timanh.com", "localhost", "127.0.0.1"];
@@ -207,6 +207,10 @@ async function submitSearchCriteria(searchType, searchValue, file){
       }
 
       let query = {};
+      if (route.query.raceid){
+        query.raceid = route.query.raceid;
+      }
+
       if (searchingInfo.searchType == 2){ // search by bib, then, update bib in Url
         query.bib = searchValue; 
       };
@@ -246,10 +250,9 @@ async function loadPageData(pageNumber){
   const pageSizeForDownload = 1000; // no use has 1k image, this is to guarantee that all images of an user can be returned.
   searchingInfo.pageSize =  pageSizeForDownload;
   searchingInfo.pageNumber = globalConfig.startingPage;
-  searchingInfo.previousFaceIds = null; // verify with Hai
-// file is still the one is uploaded before and stored in searchInfo in submitSearchCriteria function
-  
+  // file is still the one is uploaded before and stored in searchInfo in submitSearchCriteria function
   showModal.value = true;
+  
   await searchData(searchingInfo).then(response => {
       const images = response.data.images;
       generateZIP(images);
@@ -257,7 +260,6 @@ async function loadPageData(pageNumber){
   
   searchingInfo.pageSize =  pageSize;
   searchingInfo.pageNumber = pageNumber;
-  searchingInfo.previousFaceIds = previousFaceIds;
  }
 
 function generateZIP(imageList) {
@@ -274,7 +276,7 @@ function generateZIP(imageList) {
   
   var zipFilename = "timanh.zip";
   const numberofImages = imageList.length; 
-  
+  var numberofImagesDownloaded = 0;
   imageList.forEach(function (imageItem, index) {
     var url = imageItem.imageWithLogoUrl;
     
@@ -283,6 +285,7 @@ function generateZIP(imageList) {
   
     // loading a file and add it in a zip file
     JSZipUtils.getBinaryContent(url, function (err, data) {
+      numberofImagesDownloaded++; // no matter fail or succeed, keep going on. Later on we can keep track of failed downdload
       if (err) {
         // may re-download here if needed. But keep it for later on
         console.log(err);
@@ -298,17 +301,21 @@ function generateZIP(imageList) {
       }
       
       
-      if (downloadProgress.value <= 92){ // hack to guarantee that value is always <=100%
-        downloadProgress.value = downloadProgress.value + Math.ceil(100 / numberofImages);
+      var nextProgress = downloadProgress.value + Math.ceil(100 / numberofImages);
+      if (nextProgress >= 100){ // hack to guarantee that value is always <=100%
+        downloadProgress.value  = 98;
       } 
+      else {
+        downloadProgress.value = nextProgress;
+      }
       
-      if (index == numberofImages - 1) { // index start from 0
+      if (numberofImagesDownloaded == numberofImages) { // index start from 0
         zip.generateAsync({ type: 'blob' }).then(function (content) {
           saveAs(content, zipFilename);
           setTimeout(function () {
             showModal.value = false;
             downloadProgress.value = 0;
-        }, 1000);
+        }, 1500);
      
         });
       }
