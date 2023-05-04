@@ -56,16 +56,19 @@ if (raceid != 0){
   if (!queryinUrl){ // no query, perhaps, the first time loading page. Perhaps, query only exists if users paste a link after searching bib on browser 
     router.push({name:'embeded' , query:{raceid: raceid}});
   }
-  else{ // if query exits
+  else{ // if query exits either (localhost:5001?aaaa=2 - meaning the site has a param already or localhost:5001?raceid=2 or localhost:5001?raceid=2&bib=4)
     var routeQuery = {};
     var queryParamsInUrl = queryinUrl.split('?')[1]; // ?raceid=3&bib=4 -> split should come ['', 'raceid=3&bib=4'], so take [1]
     var keyvalues = queryParamsInUrl.split('&');     // ['raceid=3', 'bib=4']
     keyvalues.forEach((entry) =>{
       // note that although it's rare, clients may have their own params in query, so in theory, we should add all and push
-      var [key, value] = entry.split('='); // 
-      routeQuery[key] = value;
+        var [key, value] = entry.split('='); 
+        routeQuery[key] = value;
     });
 
+    if (!routeQuery['raceid'] ){ //localhost:5001?aaaa=2. If click a link in fb messenger, a param like ?fbid=42424234.35235 is added
+      routeQuery['raceid'] = raceid
+    }
     router.push({name:'embeded', query:routeQuery});
   }
 }
