@@ -13,43 +13,26 @@ describe('racedetails with beforeeach to setup common data', () => {
 
   // set up common behaviors for page without caring about raceid
   beforeEach(() => {
-    // should intercept and set alias before visiting the page because if visit the page, and set alias, then wait
-    // so, in some cases, response is returned so quickly, so the flow is stuck because of cy.wait as it runs forever as the request is complete & no more one is made
-    // https://egghead.io/blog/intercepting-network-requests-in-cypress
-    // perhaps, if make a second call to request, need to use alias again and call wait command one more time (the same as the first one).
-    cy.intercept(`${searchImagesUrl}*`).as('searchImages');
-    cy.intercept(getCampsUrl).as('findCamps');
-    cy.visit(baseUrl); 
- 
-    //cy.intercept('https://yourbib.xyz/v1/images/search-images*').as('searchImages');
-    //cy.visit('http://127.0.0.1:5174');
-    //cy.intercept('https://yourbib.xyz/v1/campaign/find').as('findCamps');
-
-    // default value of combo is 1 (wrong code, but not good time to fix) before fetching data
-    // so we need to wait here for data to be loaded as a fix.
-    cy.wait('@findCamps');
-    cy.get('#btnMove').click();
-    cy.wait('@searchImages', {timeout: 15000}).then(($intecerption) =>{
-      numberofPage = Math.ceil($intecerption.response.body.total / numberOfItemsPerPage);
-      total = $intecerption.response.body.total;
-      campName = $intecerption.response.body.campaignName;
-    });  
+  //  should intercept and set alias before visiting the page because if visit the page, and set alias, then wait
+  //  so, in some cases, response is returned so quickly, so the flow is stuck because of cy.wait as it runs forever as the request is complete & no more one is made
+  //   https://egghead.io/blog/intercepting-network-requests-in-cypress
+  //  perhaps, if make a second call to request, need to use alias again and call wait command one more time (the same as the first one).
+  //  cy.intercept(`${searchImagesUrl}*`).as('searchImages');
+      // revisit page, and choose happy ekiden
+      const womanEkidenId = 40;
+    
+      cy.intercept(`${searchImagesUrl}*`).as('searchImages');
+      cy.intercept(getCampsUrl).as('findCamps');
+      cy.visit(baseUrl);
+      
+      cy.wait('@findCamps');
+      cy.get('#raceList').select(womanEkidenId.toString());
+      cy.get('#btnMove').click();
+      cy.wait('@searchImages');
   });
 
   // search by images timeout at home
-  it.skip('should search by image after visiting a page', () => {
-    // revisit page, and choose happy ekiden
-    const womanEkidenId = 40;
-    
-    cy.intercept(`${searchImagesUrl}*`).as('searchImages');
-    cy.intercept(getCampsUrl).as('findCamps');
-    cy.visit(baseUrl);
-    
-    cy.wait('@findCamps');
-    cy.get('#raceList').select(womanEkidenId.toString());
-    cy.get('#btnMove').click();
-    cy.wait('@searchImages');
-
+  it('should search by image after visiting a page', () => {
     const searchFaceUrl = "https://timanh.com/v1/images/search-face";
     cy.intercept(`${searchFaceUrl}*`).as('searchFace');
     const bibSearchingType = '3'; // sync with code in RaceDetails.vue, searchType field
@@ -73,18 +56,6 @@ describe('racedetails with beforeeach to setup common data', () => {
 
     // To test prefaceID has been deleted
   it('should search by image two time continuously and succeed', () => {
-    // revisit page, and choose happy ekiden
-    const womanEkidenId = 40;
-    
-    cy.intercept(`${searchImagesUrl}*`).as('searchImages');
-    cy.intercept(getCampsUrl).as('findCamps');
-    cy.visit(baseUrl);
-    
-    cy.wait('@findCamps');
-    cy.get('#raceList').select(womanEkidenId.toString());
-    cy.get('#btnMove').click();
-    cy.wait('@searchImages');
-
     const searchFaceUrl = "https://timanh.com/v1/images/search-face";
     cy.intercept(`${searchFaceUrl}*`).as('searchFace');
     const bibSearchingType = '3'; // sync with code in RaceDetails.vue, searchType field
@@ -129,18 +100,7 @@ describe('racedetails with beforeeach to setup common data', () => {
   // when the race is deleted, need to update the test case
   // die for now as service does not returns as expected
   // search by images timeout at home
-  it.skip('should work correctly when searching different times and images', () => {
-    // revisit page, and choose happy ekiden
-    const womanEkidenId = 40;
-    cy.intercept(`${searchImagesUrl}*`).as('searchImages');
-    cy.intercept(getCampsUrl).as('findCamps');
-    cy.visit(baseUrl);
-    
-    cy.wait('@findCamps');
-    cy.get('#raceList').select(womanEkidenId.toString())//
-    cy.get('#btnMove').click();
-
-
+  it('should work correctly when searching different times and images', () => {
     // search by bib first
     var searchingType = '2'; // sync with code in RaceDetails.vue, searchType field
     const bib = '4-40'; //with woman ekiden, we have bib 4-40. Hard to know a bib exists in a race as our data is not full
