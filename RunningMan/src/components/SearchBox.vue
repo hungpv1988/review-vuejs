@@ -32,12 +32,17 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-const props = defineProps(['searchType', 'searchValue', 'allowType', 'enableDownload']);
+const props = defineProps(['searchType', 'searchValue', 'allowType', 'enableDownload', 'raceid']);
 const searchType = ref(props.searchType); // default value of int should be zero, would be setup in the next following lines
 const searchValue = ref(props.searchValue); // don't set as null. Value cannot be updated. If primitive type: string, int, let's set a default value.
 const file = ref(null);
 // by default, we support search all & search by bib
 const searchingTypes = ref([{"text":"Tất cả ảnh", "value": 1}, {"text":"Tìm kiếm theo bib", "value": 2}]);
+
+// hack, should be deleted later on
+if (props.raceid == 46) {
+    searchingTypes.value = [{"text":"Tất cả ảnh", "value": 1}, {"text":"Tìm kiếm theo ảnh", "value": 3}];
+}
 
 //searchType change, we might need to setup againt searchValu as it has a default value for searchType 01
 async function onSearchTypeChange(event){
@@ -67,7 +72,7 @@ watch(
   (newVal) =>{
    // 0 là ko gì cả, 1 là search bib, 2 là search face, 3 là search cả bib lẫn face
    // by default, we support bib searching & * (all images)
-    if (newVal == 3){
+    if ((newVal == 3) && (props.raceid != 46)){
         searchingTypes.value.push({"text":"Tìm kiếm theo ảnh", "value": 3});
     } 
   }

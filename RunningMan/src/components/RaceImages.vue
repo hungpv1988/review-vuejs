@@ -32,7 +32,7 @@
     </Modal>
 
     <!-- SearchBox is a container-fluid  -->
-    <SearchBox :enableDownload="enableDownload"  v-bind="searchingInfo" @search-images="submitSearchCriteria" :allowType="allowType" @download-images="downloadUserImages" />
+    <SearchBox :enableDownload="enableDownload" :raceid="raceid" v-bind="searchingInfo" @search-images="submitSearchCriteria" :allowType="allowType" @download-images="downloadUserImages" />
     
     <!-- SearchBox is a container-fluid  -->
     <AlbumBox :key="reloadCount" :uploadedImage="uploadedImage" v-bind="albumInfo"  @loadPage="(pageNumber) => loadPageData(pageNumber)" />
@@ -130,28 +130,56 @@ function initSearchingInfo(){
 
 // first phase in the flow. When the component is mounted, then, fetch data
 onMounted(async() => {
-  // just search by bib now, so don't need to store prefaceIDs now
-  await searchData(searchingInfo)
-         .then(response => {
-              raceName.value = response.data.campaignName;
-              if (response.data.faceMatchThreshold){ // later on, should remove this line.
-                searchingInfo.faceMatchThreshold = response.data.faceMatchThreshold;
-              }
+  // hack for now
+  // duplicated, but should adjust lated
+  if (raceid == 46){
+    
+    searchingInfo.searchType = 3;
+    await searchData(searchingInfo)
+          .then(response => {
+                raceName.value = response.data.campaignName;
+                if (response.data.faceMatchThreshold){ // later on, should remove this line.
+                  searchingInfo.faceMatchThreshold = response.data.faceMatchThreshold;
+                }
 
-              albumInfo.imageList = response.data.images;
-              albumInfo.pageCount = Math.ceil(response.data.total / globalConfig.pageSize);
-              albumInfo.totalImagesFound  = response.data.total;
+                albumInfo.imageList = response.data.images;
+                albumInfo.pageCount = Math.ceil(response.data.total / globalConfig.pageSize);
+                albumInfo.totalImagesFound  = response.data.total;
 
-              // not a good design. SearchBox needs to be instantisated well before albuminfo is retrieved, but keep this here for simplicity
-              // perhaps, move this to SearchBox info (the same for bib & asset & other thing) 
-              allowType.value = response.data.allowType; 
-          }) .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
+                // not a good design. SearchBox needs to be instantisated well before albuminfo is retrieved, but keep this here for simplicity
+                // perhaps, move this to SearchBox info (the same for bib & asset & other thing) 
+                allowType.value = response.data.allowType; 
+            }) .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
 
-          })
-          .finally(() => {
-            // should add metadata for sharing content here, but fb does not execute so that the code segment has been deleted, see git commit to take code if needed
-          });
-})
+            })
+            .finally(() => {
+              // should add metadata for sharing content here, but fb does not execute so that the code segment has been deleted, see git commit to take code if needed
+            });
+  }
+  else{
+      // just search by bib now, so don't need to store prefaceIDs now
+      await searchData(searchingInfo)
+          .then(response => {
+                raceName.value = response.data.campaignName;
+                if (response.data.faceMatchThreshold){ // later on, should remove this line.
+                  searchingInfo.faceMatchThreshold = response.data.faceMatchThreshold;
+                }
+
+                albumInfo.imageList = response.data.images;
+                albumInfo.pageCount = Math.ceil(response.data.total / globalConfig.pageSize);
+                albumInfo.totalImagesFound  = response.data.total;
+
+                // not a good design. SearchBox needs to be instantisated well before albuminfo is retrieved, but keep this here for simplicity
+                // perhaps, move this to SearchBox info (the same for bib & asset & other thing) 
+                allowType.value = response.data.allowType; 
+            }) .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
+
+            })
+            .finally(() => {
+              // should add metadata for sharing content here, but fb does not execute so that the code segment has been deleted, see git commit to take code if needed
+            });
+    }
+  })
 
 // consider to moved the main business to SearchBox later on, at here, just update albuminfo 
 // searchType, searchValue are passed from SearchBox.vue by emit event
@@ -173,6 +201,15 @@ async function submitSearchCriteria(searchType, searchValue, file){
   // this is to re-render albumbox
   reloadCount.value++;
 
+  // hack
+  // if race is 46, and search all after searching by image, then switch to searching by image with file is null. 
+  // of course, need to reset previousFaceIds
+  if ((raceid == 46) && (searchingInfo.searchType == 1)){
+    searchingInfo.searchType = 3;
+    searchingInfo.asset = null;
+    searchingInfo.previousFaceIds = null;
+  }
+
   // do a load if takes time here in the near future
   await searchData(searchingInfo)
       .then(response => {
@@ -180,9 +217,14 @@ async function submitSearchCriteria(searchType, searchValue, file){
           albumInfo.pageCount = Math.ceil(response.data.total / globalConfig.pageSize);
           albumInfo.totalImagesFound = response.data.total;
           if (searchingInfo.searchType == 3){
-            // test to see whether value can be changed in const searchingInfo
+            // in case searching all by image without given image, response.data.previousFaceIds = null
              searchingInfo.previousFaceIds = response.data.previousFaceIds; // search by image need this
-             uploadedImage.value = URL.createObjectURL(file);
+              if (file){ // add if to serve the case 46
+               uploadedImage.value = URL.createObjectURL(file);
+              }
+              else{
+               uploadedImage.value = "" // add if to serve the case 46
+              }
           }
           else{
             uploadedImage.value = "";
@@ -190,13 +232,18 @@ async function submitSearchCriteria(searchType, searchValue, file){
 
           // look stupid, should move to SearchBox
           if (searchingInfo.searchType == 2 || searchingInfo.searchType == 3){
-            enableDownload.value = true;
+              enableDownload.value = true;
           }
           else {
             enableDownload.value = false;
           }
+
+          if (searchingInfo.searchType == 3 && !file){ // hack for 46. Search all means search by image but no give images. So only when file exists, then enable download
+              enableDownload.value = false;
+          }
       })
    .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
+      console.log("error..." + error);
       albumInfo.imageList = [];
       albumInfo.pageCount = 0;
       albumInfo.totalImagesFound  = 0;
@@ -235,7 +282,7 @@ async function loadPageData(pageNumber){
               }
           })   
           .catch((error) => { // add this code segment so that vitest does not show error because of not handling error for promise
-           //   console.log(error);
+              console.log(error);
           }).finally( () => {
            // console.log('final');
           })

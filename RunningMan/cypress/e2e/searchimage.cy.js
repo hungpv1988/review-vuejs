@@ -4,7 +4,7 @@
 const path = require("path");
 var fs = require('fs');
 
-describe('racedetails with beforeeach to setup common data', () => {  
+describe('search images', () => {  
   const baseUrl = Cypress.env('baseUrl'),
         getCampsUrl = Cypress.env('getCampsUrl'),
         searchImagesUrl = Cypress.env('searchImagesUrl') ; 

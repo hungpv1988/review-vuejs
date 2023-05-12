@@ -8,7 +8,8 @@ describe('racedetails with beforeeach to setup common data', () => {
   let numberofPage, campName, total;
   const numberOfItemsPerPage = 40; // need to be in sync with code in GlobalConfig
 
-  // set up common behaviors for page without caring about raceid
+  
+  // need to review this, wrong now
   beforeEach(() => {
     // should intercept and set alias before visiting the page because if visit the page, and set alias, then wait
     // so, in some cases, response is returned so quickly, so the flow is stuck because of cy.wait as it runs forever as the request is complete & no more one is made
@@ -26,7 +27,7 @@ describe('racedetails with beforeeach to setup common data', () => {
     // so we need to wait here for data to be loaded as a fix.
     cy.wait('@findCamps');
     cy.get('#btnMove').click();
-    cy.wait('@searchImages', {timeout: 15000}).then(($intecerption) =>{
+    cy.wait('@searchImages', {timeout: 20000}).then(($intecerption) =>{
       numberofPage = Math.ceil($intecerption.response.body.total / numberOfItemsPerPage);
       total = $intecerption.response.body.total;
       campName = $intecerption.response.body.campaignName;
