@@ -39,7 +39,7 @@ describe('racedetails with beforeeach to setup common data', () => {
     });  
   });
 
-  it.skip('should be able to download images from timanh when searching bib - happy ekiden', () => {
+  it('should be able to download images from timanh when searching bib - happy ekiden', () => {
     // revisit page, and choose happy ekiden
     const happyEkidenId = 32;
     cy.intercept(`${searchImagesUrl}*`).as('searchImages');
@@ -70,9 +70,7 @@ describe('racedetails with beforeeach to setup common data', () => {
           if (res.statusCode == 200){
            numberofImagesDownloaded++; // count the number of images downloaded successfully
           }
-          // a note here is that it's not stable for downloading. Sometimes, downloading all images ok, but when zip and unzip, missing images. so that the assert
-          // below is wrong expect(count).to.equal(numberofImagesDownloaded);
-          // when running test, if seeing that we miss one or two images, then it should be ok even assert fail
+          // a note here is that it's not stable for downloading. Download may be fail although it's rare
        })
       }
     });
@@ -81,13 +79,14 @@ describe('racedetails with beforeeach to setup common data', () => {
     cy.wait(12000).then(() => {               // arbitrary wait since we don't know exactly when download is done. Can increase 2000 to 10000 for certainty
         cy.task('unzipping', {path: 'cypress/downloads/', file :'timanh.zip'}).then(()=>{
           cy.task('count', 'cypress/downloads/timanh').then((count) => {
-              expect(count).to.equal(numberofImagesDownloaded); // 39 files in folder
+              expect(count).to.equal(numberofImagesDownloaded); // 39 files in folder unless failing to download a file
+              //expect(count).to.equal(39);
           })          
         })
     });       
   });
 
-  it.skip('should be able to download images from timanh when searching by image and also different location other than timanh.com', () => {
+  it('should be able to download images from timanh when searching by image and also different location other than timanh.com', () => {
     // revisit page, and choose happy ekiden
     const womanEkidenId = 40;
     
@@ -134,7 +133,7 @@ describe('racedetails with beforeeach to setup common data', () => {
       cy.wait(18000).then(() => {               // arbitrary wait since we don't know exactly when download is done
           cy.task('unzipping', {path: 'cypress/downloads/', file :'timanh.zip'}).then(()=>{
             cy.task('count', 'cypress/downloads/timanh').then((count) => {
-                expect(count).to.equal(numberofImagesDownloaded); // around 59 images so perhaps, take time. And node env runs does not stable, dont know why but numberofImagesDownloaded sometiems different from count
+                expect(count).to.equal(numberofImagesDownloaded); // around 59 images so perhaps, take time. And node env runs does not stable, dont know why but numberofImagesDownloaded sometiems different from count, perhaps, failing download
             })          
           })
       });            

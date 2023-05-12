@@ -1,4 +1,5 @@
-// need to add test to search by image
+// use it.only if only want to run a test 
+// cypress run --spec path/to/file.spec.js
 
 describe('racedetails with beforeeach to setup common data', () => {  
   const baseUrl = Cypress.env('baseUrl'),
@@ -205,8 +206,8 @@ describe('racedetails without beforeeach', function(){
     cy.get('#image-box').find('img').should('have.length', 39); // UI shows 38, but actually 39, but have no choice as we cannot setup data as we wish now
   });
 
-      // // check whether page item is rendered correctly. In UT, we validate page and ... already, so skip here.
-   // this test is for a specific case event Happy Ekiden. (don't delete Happy Eriken)
+  // check whether page item is rendered correctly. In UT, we validate page and ... already, so skip here.
+  // this test is for a specific case event Happy Ekiden. (don't delete Happy Eriken)
   // when the race is deleted, need to update the test case
   // die for now as service does not returns as expected
   it('should work correctly when searching different times', () => {
