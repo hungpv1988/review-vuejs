@@ -96,7 +96,9 @@ const uploadedImage = ref(""); // the url of image uploaded for searching purpos
 
 // move this to SearchBox later on
 // by default, false. But if bib exists on query (f5 or search at home page), then show
-const enableDownload = ref( (!route.query.bib) ? false : true );
+//const enableDownload = ref( (!route.query.bib) ? false : true );
+const enableDownload = ref(false);
+
 const downloadProgress = ref(0);
 const showModal = ref(false);
 
@@ -141,7 +143,9 @@ onMounted(async() => {
               albumInfo.imageList = response.data.images;
               albumInfo.pageCount = Math.ceil(response.data.total / globalConfig.pageSize);
               albumInfo.totalImagesFound  = response.data.total;
-
+              if (route.query.bib && albumInfo.totalImagesFound > 0){
+                enableDownload.value = true;
+              }
               // not a good design. SearchBox needs to be instantisated well before albuminfo is retrieved, but keep this here for simplicity
               // perhaps, move this to SearchBox info (the same for bib & asset & other thing) 
               allowType.value = response.data.allowType; 
@@ -189,7 +193,7 @@ async function submitSearchCriteria(searchType, searchValue, file){
           }
 
           // look stupid, should move to SearchBox
-          if (searchingInfo.searchType == 2 || searchingInfo.searchType == 3){
+          if ((searchingInfo.searchType == 2 || searchingInfo.searchType == 3) && (albumInfo.imageList.length >0)){
             enableDownload.value = true;
           }
           else {

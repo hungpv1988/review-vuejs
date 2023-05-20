@@ -44,13 +44,14 @@ describe('homepage', () => {
     cy.get('#raceList').select(selectedIndex);
     const promise = cy.get('#raceList').invoke('val');
     cy.get('#btnMove').trigger('click');
+    cy.get('#btnDownload').should('not.exist');
     promise.then((selectedValue) =>{
       cy.url().should('include', `/races/${selectedValue}`);
       // perhaps, later on capture all data returned by findCamp, and assert alias as well
     });
   });
 
-  it('should succesfully move to race details with bib ', () => {
+  it('should succesfully move to race details with  bib ', () => {
     // set selected the second option
     const selectedIndex = 1;
     const bib = '1234';
@@ -63,5 +64,26 @@ describe('homepage', () => {
       cy.url().should('include', `/races/${selectedValue}`);
       cy.url().should('include', `?bib=${bib}`);
     });
+  });
+
+  it('should display download button if move to race details with correct bib ', () => {
+    // set selected the second option
+    const selectedIndex = 1;
+    const bib = '1234';
+    cy.get('#raceList').select(selectedIndex);
+    cy.get('#bib').type(bib);
+    const promise = cy.get('#raceList').invoke('val');
+    cy.get('#btnMove').trigger('click');
+  });
+
+  it('should not display download button if move to race details with correct bib ', () => {
+    // set selected the second option
+    const selectedIndex = 1;
+    const bib = '123424242342342434';
+    cy.get('#raceList').select(selectedIndex);
+    cy.get('#bib').type(bib);
+    const promise = cy.get('#raceList').invoke('val');
+    cy.get('#btnMove').trigger('click');
+    cy.get('#btnDownload').should('not.exist');
   });
 })

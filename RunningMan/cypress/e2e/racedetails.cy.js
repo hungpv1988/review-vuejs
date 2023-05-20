@@ -107,6 +107,15 @@ describe('racedetails with beforeeach to setup common data', () => {
       })
     });
   });
+
+  it('should not show download button if no result found when search', () => {
+    const bibSearchingType = '2'; // sync with code in RaceDetails.vue, searchType field
+    const bib = 1234534353; // wrong bib
+    cy.get('#search-type').select(bibSearchingType); 
+    cy.get('#txtBib').type(bib); 
+    cy.get('#btnSearch').click(); 
+    cy.get('#btnDownload').should('not.exist');
+  });
 })
 
 describe('racedetails without beforeeach', function(){
